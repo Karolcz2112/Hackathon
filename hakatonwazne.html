@@ -1,1065 +1,605 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Hackathon event landing page with many improved mini games">
-    <title>Hackathon Challenge — Mini gry (rozszerzone)</title>
-    <style>
-        :root {
-            --bg: radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.12), transparent), linear-gradient(180deg, #071021 0%, #071428 100%);
-            --panel: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-            --primary: #06b6d4;
-            --accent: #7c3aed;
-            --text: #e6eef8;
-            --muted: #9aa8bf;
-            --card: linear-gradient(180deg,#071428,#0d1b2a);
-            --glass: rgba(255,255,255,0.03);
-            --success: #10b981;
-            --danger: #ef4444;
-            --shadow: 0 10px 40px rgba(2,6,23,0.6);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>City Bus Rush 2D</title>
+  <style>
+    :root {
+      --bg: #06131d;
+      --panel: rgba(10, 19, 30, 0.82);
+      --cyan: #5ee7ff;
+      --text: #edf6ff;
+      --muted: #9db4c4;
+      --shadow: 0 18px 38px rgba(0,0,0,0.38);
+    }
 
-        body.theme-light {
-            --bg: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
-            --panel: linear-gradient(180deg,#ffffff,#f3f4f6);
-            --primary: #0891b2;
-            --accent: #7c3aed;
-            --text: #0f172a;
-            --muted: #475569;
-            --card: linear-gradient(180deg,#ffffff,#f1f5f9);
-            --glass: rgba(15,23,42,0.03);
-            --success: #059669;
-            --danger: #dc2626;
-            --shadow: 0 12px 34px rgba(15,23,42,0.12);
-        }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      background:
+        radial-gradient(circle at top, rgba(34, 211, 238, 0.18), transparent 38%),
+        linear-gradient(180deg, #06131d 0%, #111827 100%);
+      color: var(--text);
+      font-family: Inter, "Segoe UI", sans-serif;
+    }
 
-        * { box-sizing: border-box; }
-        html, body { height: 100%; margin: 0; }
-        body {
-            font-family: Inter, Arial, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            padding-bottom: 2rem;
-            transition: background 300ms ease, color 250ms ease;
-        }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      padding: 1rem;
+    }
 
-        header { text-align: center; padding: 1.25rem 1rem; }
-        header h1 { margin: 0; font-size: clamp(1.6rem, 3.4vw, 2.6rem); }
-        header p { margin: .2rem 0 0; color: var(--muted); }
+    .topbar {
+      width: min(1280px, calc(100vw - 2rem));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      background: rgba(11,18,26,0.7);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 0.9rem 1.1rem;
+      backdrop-filter: blur(12px);
+    }
 
-        .layout { width: min(1200px, calc(100% - 2rem)); margin: 0 auto; display: grid; grid-template-columns: 300px 1fr; gap: 1rem; }
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 0.12rem;
+    }
 
-        .panel { background: var(--panel); border-radius: 14px; padding: 1rem; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.02); }
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.1rem, 1.3vw + 0.9rem, 2rem);
+      letter-spacing: 0.6px;
+    }
 
-        .games-list { display:flex; flex-direction:column; gap:0.6rem; max-height:70vh; overflow:auto; }
-        .game-item { display:flex; align-items:center; gap:0.6rem; padding:0.7rem; border-radius:10px; cursor:pointer; background:var(--glass); border:1px solid rgba(255,255,255,0.02); transition: transform 120ms ease, box-shadow 120ms ease; }
-        .game-item:hover { transform: translateY(-2px); }
-        .game-item.active { outline: 2px solid rgba(6,182,212,0.12); box-shadow: 0 8px 20px rgba(6,182,212,0.06); }
+    .brand span {
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
 
-        .game-header { display:flex; align-items:center; gap:1rem; justify-content:space-between; margin-bottom:0.8rem; }
-        .scoreboard { font-weight:700; color:var(--text); }
-        .controls { display:flex; gap:0.6rem; }
-        button { background:var(--primary); color:#021220; border:none; padding:0.6rem 0.9rem; border-radius:10px; cursor:pointer; font-weight:700; }
-        button.secondary { background:transparent; color:var(--text); border:1px solid rgba(255,255,255,0.04); }
-        button.ghost { background:transparent; border:1px solid rgba(255,255,255,0.04); color:var(--muted); }
+    .hud {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
 
-        .game-stage { min-height:520px; border-radius:12px; padding:1rem; position:relative; display:flex; align-items:center; justify-content:center; }
-        .state-message { color:var(--muted); font-size:1.05rem; text-align:center; }
+    .stat {
+      min-width: 112px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 0.5rem 0.8rem;
+    }
 
-        .mini-board { width:100%; min-height:420px; border-radius:12px; padding:1rem; background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02)); border:1px solid rgba(255,255,255,0.02); }
-        .center { display:flex; align-items:center; justify-content:center; }
+    .stat .label {
+      display: block;
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.06rem;
+      text-transform: uppercase;
+    }
 
-        .target { position:absolute; width:56px; height:56px; border-radius:12px; background: linear-gradient(135deg,#34d399,#059669); box-shadow:0 8px 26px rgba(6,182,212,0.08); cursor:pointer; }
-        .holes { display:grid; grid-template-columns:repeat(3,92px); gap:12px; justify-content:center; }
-        .hole { width:92px; height:92px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.02); }
-        .mole { width:70px; height:70px; border-radius:50%; background:radial-gradient(circle at 30% 30%, #fbbf24,#f59e0b,#d97706); cursor:pointer; }
+    .stat .value {
+      display: block;
+      font-weight: 900;
+      font-size: 1.1rem;
+      margin-top: 0.2rem;
+    }
 
-        .pad { width:108px; height:108px; border-radius:12px; box-shadow: inset 0 -6px 0 rgba(0,0,0,0.15); cursor:pointer; }
-        .pad.red { background:#ef4444 }
-        .pad.yellow { background:#f59e0b }
-        .pad.green { background:#10b981 }
-        .pad.blue { background:#3b82f6 }
+    .game-shell {
+      width: min(1280px, calc(100vw - 2rem));
+      height: min(720px, calc(100vh - 140px));
+      position: relative;
+      border-radius: 22px;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(10,17,24,0.96), rgba(12,20,30,0.98));
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: var(--shadow);
+    }
 
-        .balloon { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); width:90px; height:110px; border-radius:50%/60%; background:linear-gradient(180deg,#fb7185,#f43f5e); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; cursor:pointer; }
+    #game-root {
+      width: 100%;
+      height: 100%;
+    }
 
-        .dodger-area { position:relative; width:100%; height:360px; overflow:hidden; border-radius:12px; }
-        .player { position:absolute; width:72px; height:26px; bottom:16px; border-radius:8px; background:linear-gradient(180deg,#06b6d4,#0ea5a4); }
-        .fall { position:absolute; width:26px; height:26px; border-radius:6px; background:linear-gradient(180deg,#fb923c,#f97316); }
+    .mission-box {
+      position: absolute;
+      left: 1rem;
+      bottom: 1rem;
+      background: rgba(6, 17, 26, 0.72);
+      border: 1px solid rgba(94,231,255,0.28);
+      border-radius: 12px;
+      padding: 0.75rem 0.9rem;
+      max-width: 340px;
+      backdrop-filter: blur(8px);
+      z-index: 10;
+      pointer-events: none;
+    }
 
-        .choices { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
-        .color-btn { width:70px; height:70px; border-radius:12px; border:3px solid transparent; cursor:pointer; }
+    .mission-box strong {
+      display: block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: var(--cyan);
+      letter-spacing: 0.08rem;
+      margin-bottom: 0.25rem;
+    }
 
-        .number-grid { display:grid; grid-template-columns:repeat(3,86px); gap:12px; justify-content:center; }
-        .number-item { width:86px; height:86px; border-radius:12px; background:rgba(255,255,255,0.02); display:flex; align-items:center; justify-content:center; font-weight:800; cursor:pointer; }
+    .mission-box span {
+      color: var(--text);
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
 
-        .blackjack { display:flex; flex-direction:column; gap:12px; align-items:center; }
-        .cards { display:flex; gap:8px; }
-        .card { width:60px; height:86px; border-radius:8px; background:linear-gradient(180deg,#fff,#f2f2f2); color:#021220; display:flex; align-items:center; justify-content:center; font-weight:800; border:1px solid rgba(0,0,0,0.08); }
-        .controls-inline { display:flex; gap:8px; }
-        .small { font-size:0.85rem; color:var(--muted); }
+    .control-button {
+      position: absolute;
+      right: 1rem;
+      bottom: 1rem;
+      z-index: 11;
+      background: linear-gradient(180deg, rgba(94,231,255,0.14), rgba(34,211,238,0.1));
+      border: 1px solid rgba(94,231,255,0.38);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 0.8rem 1rem;
+      cursor: pointer;
+      font-weight: 800;
+      box-shadow: 0 12px 20px rgba(0,0,0,0.2);
+    }
 
-        @media (max-width: 920px) {
-            .layout { grid-template-columns: 1fr; }
-            .game-stage { min-height: 520px; }
-        }
-    </style>
+    @media (max-width: 760px) {
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .hud {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .stat {
+        flex: 1 1 28%;
+        min-width: auto;
+      }
+      .game-shell {
+        height: min(640px, calc(100vh - 220px));
+      }
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>Hackathon — Mini gry (rozszerzone)</h1>
-        <p>Dodano nowe gry, poprawiony motyw, Blackjack z licznikiem punktów i ulepszone mechaniki.</p>
-    </header>
-
-    <div class="layout">
-        <aside class="panel">
-            <h3>Wybór gry</h3>
-            <div style="margin-bottom:0.6rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
-                <button id="toggleSound" class="secondary">Dźwięk: ON</button>
-                <button id="toggleTheme" class="ghost">Motyw: Dark</button>
-            </div>
-            <div class="games-list" id="gamesList"></div>
-            <hr style="border:none;border-top:1px solid rgba(255,255,255,0.02);margin-top:0.8rem;margin-bottom:0.6rem;">
-            <div style="color:var(--muted);font-size:0.9rem">High scores (local): <div id="highScores" style="margin-top:0.4rem;color:var(--muted)"></div></div>
-        </aside>
-
-        <main class="panel">
-            <div class="game-header">
-                <div>
-                    <div class="scoreboard">Score: <span id="score">0</span></div>
-                    <div style="color:var(--muted);font-size:0.9rem">Gra: <span id="currentGameName">-</span></div>
-                </div>
-                <div class="controls">
-                    <button id="startBtn">Start</button>
-                    <button id="stopBtn" class="secondary" disabled>Stop</button>
-                    <button id="resetBtn" class="ghost">Reset</button>
-                </div>
-            </div>
-
-            <div class="game-stage panel" id="gameStage">
-                <div class="state-message">Wybierz grę po lewej, następnie kliknij Start</div>
-            </div>
-        </main>
+  <div class="topbar">
+    <div class="brand">
+      <h1>City Bus Rush 2D</h1>
+      <span>Autobus przez miasto — misje, pasażerowie, czas i paliwo</span>
     </div>
 
-    <script>
-        const games = [
-            { id: 'clickTarget', name: 'Click Target', desc: 'Klikaj ruchomy cel' },
-            { id: 'rapidClick', name: 'Rapid Click', desc: 'Klikaj jak najwięcej' },
-            { id: 'reaction', name: 'Reaction Test', desc: 'Test reakcji' },
-            { id: 'whack', name: 'Whack-a-Mole', desc: 'Uderz kreta' },
-            { id: 'math', name: 'Math Quiz', desc: 'Szybkie działania' },
-            { id: 'simon', name: 'Simon Memory', desc: 'Powtarzaj sekwencję' },
-            { id: 'balloon', name: 'Balloon Pop', desc: 'Przebij balon' },
-            { id: 'colorMatch', name: 'Color Match', desc: 'Dopasuj kolor' },
-            { id: 'numberFind', name: 'Find Numbers', desc: 'Klikaj liczby w kolejności' },
-            { id: 'dodger', name: 'Dodger', desc: 'Omijaj obiekty' },
-            { id: 'blackjack', name: 'Blackjack', desc: 'Zagraj przeciwko krupierowi' },
-            { id: 'slots', name: 'Slots', desc: 'Prosty automat' },
-            { id: 'hangman', name: 'Hangman', desc: 'Zgadnij słowo' },
-            { id: 'typing', name: 'Typing Test', desc: 'Szybkie pisanie' },
-            { id: 'higherLower', name: 'Higher or Lower', desc: 'Zgadnij większą liczbę' },
-            { id: 'memoryPairs', name: 'Memory Pairs', desc: 'Znajdź pary kart' },
-            { id: 'luckySpin', name: 'Lucky Spin', desc: 'Kręć tryb wygranej' },
-            { id: 'fruitCatcher', name: 'Fruit Catcher', desc: 'Złap spadające owoce' }
+    <div class="hud">
+      <div class="stat">
+        <span class="label">Score</span>
+        <span class="value" id="score">0</span>
+      </div>
+      <div class="stat">
+        <span class="label">Time</span>
+        <span class="value" id="time">180</span>
+      </div>
+      <div class="stat">
+        <span class="label">Pasażerowie</span>
+        <span class="value" id="passengers">0</span>
+      </div>
+      <div class="stat">
+        <span class="label">Paliwo</span>
+        <span class="value" id="fuel">100%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-shell">
+    <div id="game-root"></div>
+    <div class="mission-box">
+      <strong>Misja</strong>
+      <span id="missionText">Zbieraj pasażerów i dowoź ich do punktów docelowych.</span>
+    </div>
+    <button class="control-button" id="restartBtn">Restart</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+  <script>
+    const scoreEl = document.getElementById('score');
+    const timeEl = document.getElementById('time');
+    const passengerEl = document.getElementById('passengers');
+    const fuelEl = document.getElementById('fuel');
+    const missionTextEl = document.getElementById('missionText');
+    const restartBtn = document.getElementById('restartBtn');
+
+    class CityBusScene extends Phaser.Scene {
+      constructor() {
+        super('CityBusScene');
+      }
+
+      create() {
+        this.worldWidth = 2200;
+        this.worldHeight = 1600;
+        this.gameOver = false;
+        this.score = 0;
+        this.timeLeft = 180;
+        this.currentMission = null;
+        this.activePassenger = null;
+        this.passengerCount = 0;
+        this.fuel = 100;
+        this.stopWaiters = new Set();
+
+        this.cameras.main.setBackgroundColor('#102330');
+        this.cameras.main.setBounds(0, 0, this.worldWidth, this.worldHeight);
+
+        this.createCity();
+        this.createPlayer();
+        this.createStops();
+        this.createTraffic();
+        this.createRoadDecor();
+        this.createInput();
+        this.updateHud();
+
+        this.time.addEvent({
+          delay: 1000,
+          loop: true,
+          callback: () => {
+            if (this.gameOver) return;
+            this.timeLeft -= 1;
+            const driftFactor = Math.abs(this.player.speed) / 240;
+            this.fuel = Phaser.Math.Clamp(this.fuel - 1.2 * driftFactor, 0, 100);
+            if (this.timeLeft <= 0 || this.fuel <= 0) {
+              this.endGame();
+            }
+            this.updateHud();
+          }
+        });
+      }
+
+      createCity() {
+        this.roadRects = [];
+        const g = this.add.graphics();
+        g.fillStyle(0x143245, 1);
+        g.fillRect(0, 0, this.worldWidth, this.worldHeight);
+
+        const roadData = [
+          { x: 200, y: 130, w: 1680, h: 130 },
+          { x: 200, y: 430, w: 1680, h: 130 },
+          { x: 200, y: 780, w: 1680, h: 130 },
+          { x: 200, y: 1130, w: 1680, h: 130 },
+          { x: 300, y: 80, w: 120, h: 1420 },
+          { x: 650, y: 80, w: 120, h: 1420 },
+          { x: 1000, y: 80, w: 120, h: 1420 },
+          { x: 1350, y: 80, w: 120, h: 1420 },
+          { x: 1700, y: 80, w: 120, h: 1420 },
+          { x: 1940, y: 80, w: 120, h: 1420 }
         ];
 
-        const gamesList = document.getElementById('gamesList');
-        const gameStage = document.getElementById('gameStage');
-        const scoreEl = document.getElementById('score');
-        const startBtn = document.getElementById('startBtn');
-        const stopBtn = document.getElementById('stopBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const currentGameName = document.getElementById('currentGameName');
-        const highScoresEl = document.getElementById('highScores');
-        const toggleSoundBtn = document.getElementById('toggleSound');
-        const toggleThemeBtn = document.getElementById('toggleTheme');
+        roadData.forEach((r) => {
+          g.fillStyle(0x2a3542, 1);
+          g.fillRoundedRect(r.x, r.y, r.w, r.h, 20);
+          this.roadRects.push(new Phaser.Geom.Rectangle(r.x, r.y, r.w, r.h));
 
-        let currentGame = localStorage.getItem('hackathon.currentGame') || 'clickTarget';
-        let gameRunning = false;
-        let score = 0;
-        let timer = null;
-        let timeLeft = 0;
-        let cleanupFns = [];
-        let soundOn = localStorage.getItem('hackathon.soundOn') !== 'false';
-        let darkTheme = localStorage.getItem('hackathon.darkTheme') !== 'false';
-
-        function registerCleanup(fn) { cleanupFns.push(fn); }
-        function runCleanup() { cleanupFns.forEach(fn => { try { fn(); } catch (e) {} }); cleanupFns = []; }
-        function updateScore() { scoreEl.textContent = score; }
-        function updateGameName() { const g = games.find(x => x.id === currentGame); currentGameName.textContent = g ? g.name : '-'; }
-        function clearGlobalTimer() { if (timer) { clearInterval(timer); timer = null; } }
-        function setTime(s) { timeLeft = s; renderTime(); }
-        function renderTime() { const el = document.getElementById('timeDisplay'); if (el) el.textContent = timeLeft + 's'; }
-
-        function playSound(id) { if (!soundOn) return; if (!id) return; try { const audio = new Audio(id); audio.play(); } catch (e) {} }
-
-        function saveHighScore(gameId, value) {
-            try {
-                const key = 'hackathon.high.' + gameId;
-                const prev = Number(localStorage.getItem(key) || 0);
-                if (value > prev) {
-                    localStorage.setItem(key, String(value));
-                }
-            } catch (e) {}
-            renderHighScores();
-        }
-
-        function renderHighScores() {
-            highScoresEl.innerHTML = '';
-            games.forEach(g => {
-                const v = Number(localStorage.getItem('hackathon.high.' + g.id) || 0);
-                const row = document.createElement('div');
-                row.textContent = `${g.name}: ${v}`;
-                highScoresEl.appendChild(row);
-            });
-        }
-
-        function renderGames() {
-            gamesList.innerHTML = '';
-            games.forEach(g => {
-                const el = document.createElement('div');
-                el.className = 'game-item' + (g.id === currentGame ? ' active' : '');
-                el.innerHTML = `<div style="flex:1"><div style="font-weight:800">${g.name}</div><div class="small">${g.desc}</div></div>`;
-                el.addEventListener('click', () => selectGame(g.id));
-                gamesList.appendChild(el);
-            });
-        }
-
-        function selectGame(id) {
-            if (gameRunning) stopGame();
-            currentGame = id;
-            localStorage.setItem('hackathon.currentGame', id);
-            renderGames();
-            updateGameName();
-            setGameMessage('Wybrano: ' + (games.find(x => x.id === currentGame) || {}).name);
-        }
-
-        function setGameMessage(text) {
-            runCleanup();
-            gameStage.innerHTML = `<div class="state-message">${text}</div>`;
-        }
-
-        function resetKeepSelection() {
-            runCleanup();
-            clearGlobalTimer();
-            gameRunning = false;
-            score = 0;
-            updateScore();
-            setTime(0);
-            setGameMessage('Resetowane (gra pozostaje): ' + (games.find(x => x.id === currentGame) || {}).name);
-            startBtn.disabled = false;
-            stopBtn.disabled = true;
-        }
-
-        function stopGame() {
-            if (!gameRunning) return;
-            runCleanup();
-            gameRunning = false;
-            clearGlobalTimer();
-            startBtn.disabled = false;
-            stopBtn.disabled = true;
-            setGameMessage('Gra zatrzymana. Wynik: ' + score);
-        }
-
-        function startClickTarget() {
-            runCleanup();
-            gameStage.innerHTML = '<div class="mini-board" id="targetBoard"></div>';
-            const board = document.getElementById('targetBoard');
-            const target = document.createElement('div');
-            target.className = 'target';
-            target.textContent = '●';
-            board.appendChild(target);
-
-            function moveTarget() {
-                const w = board.clientWidth - 56;
-                const h = board.clientHeight - 56;
-                target.style.left = (Math.random() * w) + 'px';
-                target.style.top = (Math.random() * h) + 'px';
+          g.lineStyle(3, 0xf5f5f5, 0.18);
+          if (r.w > r.h) {
+            for (let i = r.x + 50; i < r.x + r.w; i += 110) {
+              g.fillStyle(0xf6f8fb, 0.25);
+              g.fillRect(i, r.y + r.h / 2 - 4, 30, 8);
             }
-
-            const moveIv = setInterval(() => { if (gameRunning) moveTarget(); }, 900);
-            target.addEventListener('click', () => {
-                if (!gameRunning) return;
-                score += 1;
-                updateScore();
-                moveTarget();
-            });
-            registerCleanup(() => { clearInterval(moveIv); target.remove(); });
-            startCountdown(20);
-            moveTarget();
-        }
-
-        function startRapidClick() {
-            runCleanup();
-            gameStage.innerHTML = '<div class="mini-board center"><button id="rapidBtn" style="padding:1rem 1.6rem;font-size:1.4rem;border-radius:12px;background:var(--accent);color:white;border:none">Klik!</button></div>';
-            const btn = document.getElementById('rapidBtn');
-            btn.addEventListener('click', () => {
-                if (!gameRunning) return;
-                score += 1;
-                updateScore();
-            });
-            registerCleanup(() => btn.remove());
-            startCountdown(10);
-        }
-
-        function startReaction() {
-            runCleanup();
-            gameStage.innerHTML = '<div class="mini-board center"><div id="reactMsg" style="font-size:1.4rem;color:var(--muted)">Czekaj na zielone...</div></div>';
-            const msg = document.getElementById('reactMsg');
-            let ready = false;
-            let startDelay = setTimeout(() => {
-                msg.textContent = 'Kliknij teraz!';
-                msg.style.color = 'var(--success)';
-                ready = true;
-            }, 1200 + Math.random() * 1800);
-
-            function onStageClick() {
-                if (!gameRunning) return;
-                if (!ready) {
-                    msg.textContent = 'Za wcześnie!';
-                    msg.style.color = 'var(--danger)';
-                    return;
-                }
-                score += 1;
-                updateScore();
-                msg.textContent = 'Dobrze!';
-                msg.style.color = 'var(--success)';
-                endRound('Reakcja OK!');
+          } else {
+            for (let i = r.y + 50; i < r.y + r.h; i += 110) {
+              g.fillStyle(0xf6f8fb, 0.25);
+              g.fillRect(r.x + r.w / 2 - 4, i, 8, 30);
             }
-
-            gameStage.addEventListener('click', onStageClick);
-            registerCleanup(() => { clearTimeout(startDelay); gameStage.removeEventListener('click', onStageClick); });
-            startCountdown(8);
-        }
-
-        function startWhack() {
-            runCleanup();
-            gameStage.innerHTML = '<div class="mini-board"><div class="holes" id="holesGrid"></div></div>';
-            const grid = document.getElementById('holesGrid');
-            const holes = [];
-            for (let i = 0; i < 9; i++) {
-                const hole = document.createElement('div');
-                hole.className = 'hole';
-                grid.appendChild(hole);
-                holes.push(hole);
-            }
-
-            let moleIv = setInterval(() => {
-                if (!gameRunning) return;
-                holes.forEach(h => h.innerHTML = '');
-                const idx = Math.floor(Math.random() * holes.length);
-                const mole = document.createElement('div');
-                mole.className = 'mole';
-                mole.addEventListener('click', () => {
-                    if (!gameRunning) return;
-                    score += 1;
-                    updateScore();
-                    mole.remove();
-                });
-                holes[idx].appendChild(mole);
-            }, 700);
-            registerCleanup(() => { clearInterval(moleIv); holes.forEach(h => h.innerHTML = ''); });
-            startCountdown(20);
-        }
-
-        function startMath() {
-            runCleanup();
-            gameStage.innerHTML = '<div class="mini-board center"><div style="max-width:420px;text-align:center"><div id="mathQ" style="font-size:1.3rem;font-weight:800"></div><input id="mathInput" type="number" style="margin-top:8px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);width:100%"><div style="margin-top:8px"><button id="mathOk">OK</button></div></div></div>';
-            const qEl = document.getElementById('mathQ');
-            const inp = document.getElementById('mathInput');
-            const ok = document.getElementById('mathOk');
-            let correct = 0;
-            function nextQ() {
-                const a = Math.floor(Math.random() * 12) + 1;
-                const b = Math.floor(Math.random() * 12) + 1;
-                correct = a + b;
-                qEl.textContent = `${a} + ${b} = ?`;
-                inp.value = '';
-                inp.focus();
-            }
-            ok.addEventListener('click', () => {
-                if (!gameRunning) return;
-                if (Number(inp.value) === correct) {
-                    score += 1;
-                    updateScore();
-                    nextQ();
-                } else {
-                    nextQ();
-                }
-            });
-            registerCleanup(() => ok.remove());
-            startCountdown(35);
-            nextQ();
-        }
-
-        function startSimon() {
-            runCleanup();
-            gameStage.innerHTML = '<div class="mini-board"><div class="choices" id="simonPads"></div></div>';
-            const padContainer = document.getElementById('simonPads');
-            const colors = ['red', 'green', 'blue', 'yellow'];
-            const pads = colors.map(color => {
-                const p = document.createElement('div');
-                p.className = 'color-btn';
-                p.dataset.color = color;
-                p.style.background = color;
-                p.style.width = '90px';
-                p.style.height = '90px';
-                p.style.border = '3px solid rgba(255,255,255,0.06)';
-                padContainer.appendChild(p);
-                return p;
-            });
-            let seq = [];
-            let idx = 0;
-            let playingSeq = false;
-
-            function flash(color) {
-                const p = pads.find(x => x.dataset.color === color);
-                if (!p) return;
-                p.style.transform = 'scale(1.08)';
-                setTimeout(() => p.style.transform = '', 180);
-            }
-
-            function playSeq() {
-                playingSeq = true;
-                seq.forEach((c, i) => setTimeout(() => flash(c), (i + 1) * 600));
-                setTimeout(() => playingSeq = false, seq.length * 650);
-            }
-
-            function addStep() {
-                seq.push(colors[Math.floor(Math.random() * colors.length)]);
-                idx = 0;
-                playSeq();
-            }
-
-            pads.forEach(p => {
-                p.addEventListener('click', () => {
-                    if (!gameRunning || playingSeq) return;
-                    const c = p.dataset.color;
-                    flash(c);
-                    if (c !== seq[idx]) {
-                        endRound('Błąd!');
-                        return;
-                    }
-                    idx += 1;
-                    if (idx >= seq.length) {
-                        score += 1;
-                        updateScore();
-                        addStep();
-                    }
-                });
-            });
-            addStep();
-            startCountdown(45);
-            registerCleanup(() => pads.forEach(p => p.remove()));
-        }
-
-        function startBalloon() {
-            runCleanup();
-            gameStage.innerHTML = '<div class="mini-board" id="balloonBoard"></div>';
-            const board = document.getElementById('balloonBoard');
-            const balloon = document.createElement('div');
-            balloon.className = 'balloon';
-            balloon.textContent = 'POP';
-            board.appendChild(balloon);
-
-            balloon.addEventListener('click', () => {
-                if (!gameRunning) return;
-                score += 3;
-                updateScore();
-                balloon.style.transform = 'scale(0.2)';
-                balloon.style.opacity = '0';
-                setTimeout(() => balloon.remove(), 220);
-            });
-            registerCleanup(() => balloon.remove());
-            startCountdown(20);
-        }
-
-        function startColorMatch() {
-            runCleanup();
-            gameStage.innerHTML = '<div class="mini-board center"><div><div id="colorText" style="font-weight:800;font-size:1.4rem;margin-bottom:8px"></div><div class="choices" id="colorChoices"></div></div></div>';
-            const colorText = document.getElementById('colorText');
-            const choices = document.getElementById('colorChoices');
-            const colors = ['red', 'green', 'blue', 'yellow'];
-            let correct = '';
-
-            function round() {
-                const label = colors[Math.floor(Math.random() * colors.length)];
-                correct = label;
-                colorText.textContent = label.toUpperCase();
-                choices.innerHTML = '';
-                const options = [...colors].sort(() => Math.random() - 0.5);
-                options.forEach(color => {
-                    const btn = document.createElement('div');
-                    btn.className = 'color-btn';
-                    btn.style.background = color;
-                    btn.style.width = '70px';
-                    btn.style.height = '70px';
-                    btn.addEventListener('click', () => {
-                        if (!gameRunning) return;
-                        if (color === correct) {
-                            score += 1;
-                            updateScore();
-                        }
-                        round();
-                    });
-                    choices.appendChild(btn);
-                });
-            }
-
-            round();
-            startCountdown(25);
-        }
-
-        function startNumberFind() {
-            runCleanup();
-            gameStage.innerHTML = '<div class="mini-board"><div class="number-grid" id="numGrid"></div></div>';
-            const grid = document.getElementById('numGrid');
-            const values = Array.from({ length: 9 }, (_, i) => i + 1).sort(() => Math.random() - 0.5);
-            values.forEach(n => {
-                const cell = document.createElement('div');
-                cell.className = 'number-item';
-                cell.textContent = n;
-                cell.addEventListener('click', () => {
-                    if (!gameRunning) return;
-                    if (n === 1) {
-                        score += 1;
-                        updateScore();
-                    }
-                });
-                grid.appendChild(cell);
-            });
-            startCountdown(30);
-        }
-
-        function startDodger() {
-            runCleanup();
-            gameStage.innerHTML = '<div class="mini-board"><div class="dodger-area" id="dodgerArea" tabindex="0"></div></div>';
-            const area = document.getElementById('dodgerArea');
-            const player = document.createElement('div');
-            player.className = 'player';
-            area.appendChild(player);
-            let px = (area.clientWidth - 72) / 2;
-            player.style.left = px + 'px';
-            const falls = [];
-
-            function keyHandler(e) {
-                if (!gameRunning) return;
-                if (e.key === 'ArrowLeft') px = Math.max(0, px - 30);
-                if (e.key === 'ArrowRight') px = Math.min(area.clientWidth - 72, px + 30);
-                player.style.left = px + 'px';
-            }
-            area.addEventListener('keydown', keyHandler);
-            area.focus();
-
-            const spawnIv = setInterval(() => {
-                if (!gameRunning) return;
-                const f = document.createElement('div');
-                f.className = 'fall';
-                f.style.left = (Math.random() * (area.clientWidth - 26)) + 'px';
-                f.style.top = '-26px';
-                area.appendChild(f);
-                falls.push(f);
-            }, 700);
-
-            const stepIv = setInterval(() => {
-                if (!gameRunning) return;
-                for (let i = falls.length - 1; i >= 0; i--) {
-                    const f = falls[i];
-                    const top = parseFloat(f.style.top || '0') + 6;
-                    f.style.top = top + 'px';
-                    const left = parseFloat(f.style.left || '0');
-                    if (top > area.clientHeight - 26 && left > px - 20 && left < px + 72) {
-                        endRound('Trafiony!');
-                        return;
-                    }
-                    if (top > area.clientHeight + 20) {
-                        f.remove();
-                        falls.splice(i, 1);
-                    }
-                }
-            }, 50);
-
-            registerCleanup(() => {
-                clearInterval(spawnIv);
-                clearInterval(stepIv);
-                area.removeEventListener('keydown', keyHandler);
-                falls.forEach(x => x.remove());
-                player.remove();
-            });
-            startCountdown(35);
-        }
-
-        function startBlackjack() {
-            runCleanup();
-            gameStage.innerHTML = '<div class="mini-board center blackjack" id="bjBoard"><div style="width:100%;display:flex;justify-content:space-between"><div><div style="font-weight:800">Dealer</div><div class="cards" id="dealerCards"></div><div class="small" id="dealerVal"></div></div><div><div style="font-weight:800">Player</div><div class="cards" id="playerCards"></div><div class="small" id="playerVal"></div></div></div><div id="bjStatus" class="small"></div><div id="bjControls" class="controls-inline" style="margin-top:12px"></div></div>';
-
-            const dealerCardsEl = document.getElementById('dealerCards');
-            const playerCardsEl = document.getElementById('playerCards');
-            const dealerValEl = document.getElementById('dealerVal');
-            const playerValEl = document.getElementById('playerVal');
-            const bjStatus = document.getElementById('bjStatus');
-            const controls = document.getElementById('bjControls');
-            let deck = buildDeck();
-            shuffle(deck);
-            let playerHand = [];
-            let dealerHand = [];
-
-            function drawCard() { return deck.pop(); }
-            function cardValue(card) {
-                if (['J', 'Q', 'K'].includes(card.rank)) return 10;
-                if (card.rank === 'A') return 11;
-                return Number(card.rank);
-            }
-            function handValue(hand) {
-                let val = hand.reduce((sum, c) => sum + cardValue(c), 0);
-                let aces = hand.filter(c => c.rank === 'A').length;
-                while (val > 21 && aces > 0) {
-                    val -= 10;
-                    aces -= 1;
-                }
-                return val;
-            }
-
-            function renderHands(showDealer = false) {
-                dealerCardsEl.innerHTML = '';
-                playerCardsEl.innerHTML = '';
-                dealerHand.forEach((card, i) => {
-                    const el = document.createElement('div');
-                    el.className = 'card';
-                    el.textContent = (i === 0 && !showDealer) ? '❓' : `${card.rank}${card.suit}`;
-                    dealerCardsEl.appendChild(el);
-                });
-                playerHand.forEach(card => {
-                    const el = document.createElement('div');
-                    el.className = 'card';
-                    el.textContent = `${card.rank}${card.suit}`;
-                    playerCardsEl.appendChild(el);
-                });
-                playerValEl.textContent = 'Player: ' + handValue(playerHand);
-                dealerValEl.textContent = showDealer ? 'Dealer: ' + handValue(dealerHand) : 'Dealer: ?';
-            }
-
-            function endRoundBJ(msg, result) {
-                renderHands(true);
-                if (result === 'win') {
-                    score += 2;
-                    bjStatus.textContent = 'Punkty rundy: +2 (wygrana)';
-                } else if (result === 'draw') {
-                    bjStatus.textContent = 'Punkty rundy: remis';
-                } else {
-                    score = Math.max(0, score - 1);
-                    bjStatus.textContent = 'Punkty rundy: -1 (przegrana)';
-                }
-                updateScore();
-                setTimeout(() => endRound(msg), 200);
-            }
-
-            function startDeal() {
-                playerHand.push(drawCard());
-                dealerHand.push(drawCard());
-                playerHand.push(drawCard());
-                dealerHand.push(drawCard());
-                renderHands();
-            }
-
-            function onHit() {
-                playerHand.push(drawCard());
-                renderHands();
-                if (handValue(playerHand) > 21) {
-                    endRoundBJ('Przegrałeś (bust)', 'lose');
-                }
-            }
-
-            function onStand() {
-                while (handValue(dealerHand) < 17) {
-                    dealerHand.push(drawCard());
-                }
-                const pv = handValue(playerHand);
-                const dv = handValue(dealerHand);
-                if (dv > 21 || pv > dv) {
-                    endRoundBJ('Wygrałeś!', 'win');
-                } else if (pv === dv) {
-                    endRoundBJ('Remis', 'draw');
-                } else {
-                    endRoundBJ('Przegrałeś', 'lose');
-                }
-            }
-
-            const hitBtn = document.createElement('button');
-            hitBtn.textContent = 'Hit';
-            const standBtn = document.createElement('button');
-            standBtn.textContent = 'Stand';
-            const newBtn = document.createElement('button');
-            newBtn.textContent = 'Nowa talia';
-            controls.appendChild(hitBtn);
-            controls.appendChild(standBtn);
-            controls.appendChild(newBtn);
-
-            hitBtn.addEventListener('click', () => { if (gameRunning) onHit(); });
-            standBtn.addEventListener('click', () => { if (gameRunning) onStand(); });
-            newBtn.addEventListener('click', () => {
-                if (!gameRunning) return;
-                deck = buildDeck();
-                shuffle(deck);
-                playerHand = [];
-                dealerHand = [];
-                startDeal();
-            });
-
-            registerCleanup(() => {
-                hitBtn.remove();
-                standBtn.remove();
-                newBtn.remove();
-            });
-
-            deck = buildDeck();
-            shuffle(deck);
-            playerHand = [];
-            dealerHand = [];
-            startDeal();
-            startCountdown(60);
-            bjStatus.textContent = 'Licznik punktów: ' + score;
-
-            function buildDeck() {
-                const suits = ['♠', '♥', '♦', '♣'];
-                const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-                const d = [];
-                suits.forEach(suit => ranks.forEach(rank => d.push({ suit, rank })));
-                return d;
-            }
-
-            function shuffle(array) {
-                for (let i = array.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [array[i], array[j]] = [array[j], array[i]];
-                }
-            }
-        }
-
-        function startSlots() {
-            runCleanup();
-            gameStage.innerHTML = '<div class="mini-board center"><div id="slotReel" style="display:flex;gap:12px;font-size:2.2rem"></div><div style="margin-top:12px"><button id="spinBtn">Spin</button></div></div>';
-            const reel = document.getElementById('slotReel');
-            const spinBtn = document.getElementById('spinBtn');
-            function spinOnce() {
-                reel.innerHTML = '';
-                const icons = ['🍒', '🍋', '🔔', '⭐', '7'];
-                const result = [];
-                for (let i = 0; i < 3; i++) {
-                    const icon = icons[Math.floor(Math.random() * icons.length)];
-                    result.push(icon);
-                    const el = document.createElement('div');
-                    el.textContent = icon;
-                    reel.appendChild(el);
-                }
-                if (result[0] === result[1] && result[1] === result[2]) {
-                    score += 5;
-                    updateScore();
-                }
-            }
-            spinBtn.addEventListener('click', () => { if (gameRunning) spinOnce(); });
-            registerCleanup(() => spinBtn.remove());
-            startCountdown(30);
-        }
-
-        function startHangman() {
-            runCleanup();
-            const words = ['JAVASCRIPT', 'HACKATHON', 'KOMPILATOR', 'GIT', 'HTML'];
-            const word = words[Math.floor(Math.random() * words.length)];
-            let guessed = new Set();
-            let lives = 6;
-            gameStage.innerHTML = '<div class="mini-board center"><div style="text-align:center"><div id="hangWord" style="font-size:1.4rem;letter-spacing:6px"></div><div id="hangLives" style="margin-top:8px;color:var(--muted)"></div><div id="hangLetters" style="margin-top:12px"></div></div></div>';
-            const hangWord = document.getElementById('hangWord');
-            const hangLives = document.getElementById('hangLives');
-            const hangLetters = document.getElementById('hangLetters');
-
-            function render() {
-                hangWord.textContent = word.split('').map(ch => guessed.has(ch) ? ch : '_').join(' ');
-                hangLives.textContent = 'Życia: ' + lives;
-                hangLetters.innerHTML = '';
-                'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(ch => {
-                    const btn = document.createElement('button');
-                    btn.textContent = ch;
-                    btn.style.margin = '2px';
-                    btn.disabled = guessed.has(ch) || !gameRunning;
-                    btn.addEventListener('click', () => {
-                        if (!gameRunning) return;
-                        if (word.includes(ch)) {
-                            guessed.add(ch);
-                            if (!hangWord.textContent.includes('_')) {
-                                score += 3;
-                                updateScore();
-                                endRound('Wygrałeś!');
-                                return;
-                            }
-                        } else {
-                            lives -= 1;
-                            if (lives <= 0) {
-                                endRound('Przegrałeś!');
-                                return;
-                            }
-                        }
-                        render();
-                    });
-                    hangLetters.appendChild(btn);
-                });
-            }
-            render();
-            startCountdown(45);
-        }
-
-        function startTyping() {
-            runCleanup();
-            const sample = 'Szybkie programowanie na hackathonie to frajda.';
-            gameStage.innerHTML = '<div class="mini-board center"><div style="max-width:700px;text-align:left"><div style="font-weight:800;margin-bottom:8px">Przepisz ten tekst:</div><div style="margin-bottom:8px">' + sample + '</div><textarea id="typeArea" style="width:100%;height:120px;border-radius:8px;padding:8px"></textarea><div style="margin-top:8px"><button id="typeOk">Sprawdź</button></div></div></div>';
-            const ta = document.getElementById('typeArea');
-            const ok = document.getElementById('typeOk');
-            ok.addEventListener('click', () => {
-                if (!gameRunning) return;
-                if (ta.value.trim() === sample) {
-                    score += 5;
-                    updateScore();
-                    endRound('Świetnie!');
-                } else {
-                    endRound('Błędny tekst!');
-                }
-            });
-            startCountdown(40);
-            registerCleanup(() => ok.remove());
-        }
-
-        function startHigherLower() {
-            runCleanup();
-            let current = Math.floor(Math.random() * 100) + 1;
-            gameStage.innerHTML = '<div class="mini-board center"><div style="font-size:2rem;font-weight:800" id="curNum">' + current + '</div><div class="controls-inline" style="margin-top:12px"><button id="higherBtn">Wyżej</button><button id="lowerBtn">Niżej</button></div></div>';
-            const curEl = document.getElementById('curNum');
-            const higherBtn = document.getElementById('higherBtn');
-            const lowerBtn = document.getElementById('lowerBtn');
-
-            function nextRound(choice) {
-                const next = Math.floor(Math.random() * 100) + 1;
-                const correct = (choice === 'higher' && next > current) || (choice === 'lower' && next < current);
-                current = next;
-                curEl.textContent = current;
-                if (correct) {
-                    score += 1;
-                    updateScore();
-                }
-            }
-
-            higherBtn.addEventListener('click', () => { if (gameRunning) nextRound('higher'); });
-            lowerBtn.addEventListener('click', () => { if (gameRunning) nextRound('lower'); });
-            registerCleanup(() => { higherBtn.remove(); lowerBtn.remove(); });
-            startCountdown(25);
-        }
-
-        function startMemoryPairs() {
-            runCleanup();
-            const icons = ['🍎', '🍌', '🍇', '🍉', '🍓', '🍒'];
-            const deck = [...icons, ...icons].sort(() => Math.random() - 0.5);
-            gameStage.innerHTML = '<div class="mini-board"><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px" id="memoryGrid"></div></div>';
-            const grid = document.getElementById('memoryGrid');
-            let first = null;
-
-            deck.forEach(icon => {
-                const btn = document.createElement('div');
-                btn.className = 'number-item';
-                btn.textContent = '?';
-                btn.addEventListener('click', () => {
-                    if (!gameRunning) return;
-                    btn.textContent = icon;
-                    if (!first) {
-                        first = { btn, icon };
-                        return;
-                    }
-                    if (first.icon === icon) {
-                        score += 1;
-                        updateScore();
-                        first = null;
-                    } else {
-                        const prev = first.btn;
-                        setTimeout(() => {
-                            btn.textContent = '?';
-                            prev.textContent = '?';
-                            first = null;
-                        }, 500);
-                    }
-                });
-                grid.appendChild(btn);
-            });
-            startCountdown(50);
-        }
-
-        function startLuckySpin() {
-            runCleanup();
-            gameStage.innerHTML = '<div class="mini-board center"><div style="font-size:2rem" id="spinVal">?</div><div style="margin-top:12px"><button id="doSpin">Spin</button></div></div>';
-            const val = document.getElementById('spinVal');
-            const btn = document.getElementById('doSpin');
-            btn.addEventListener('click', () => {
-                if (!gameRunning) return;
-                const n = Math.floor(Math.random() * 100) + 1;
-                val.textContent = n;
-                if (n > 90) {
-                    score += 10;
-                    updateScore();
-                }
-            });
-            registerCleanup(() => btn.remove());
-            startCountdown(20);
-        }
-
-        function startFruitCatcher() {
-            runCleanup();
-            gameStage.innerHTML = '<div class="mini-board"><div class="dodger-area" id="fruitArea" tabindex="0"></div></div>';
-            const area = document.getElementById('fruitArea');
-            const basket = document.createElement('div');
-            basket.className = 'player';
-            basket.style.width = '72px';
-            basket.style.height = '26px';
-            basket.style.left = 'calc(50% - 36px)';
-            area.appendChild(basket);
-            let bx = (area.clientWidth - 72) / 2;
-            basket.style.left = bx + 'px';
-            const fruits = [];
-
-            function keyHandler(e) {
-                if (!gameRunning) return;
-                if (e.key === 'ArrowLeft') bx = Math.max(0, bx - 30);
-                if (e.key === 'ArrowRight') bx = Math.min(area.clientWidth - 72, bx + 30);
-                basket.style.left = bx + 'px';
-            }
-            area.addEventListener('keydown', keyHandler);
-            area.focus();
-
-            const spawnIv = setInterval(() => {
-                if (!gameRunning) return;
-                const fruit = document.createElement('div');
-                fruit.className = 'fall';
-                fruit.style.left = (Math.random() * (area.clientWidth - 26)) + 'px';
-                fruit.style.top = '-26px';
-                fruit.style.background = 'linear-gradient(180deg,#fbbf24,#f59e0b)';
-                area.appendChild(fruit);
-                fruits.push(fruit);
-            }, 600);
-
-            const stepIv = setInterval(() => {
-                if (!gameRunning) return;
-                for (let i = fruits.length - 1; i >= 0; i--) {
-                    const f = fruits[i];
-                    const top = parseFloat(f.style.top || '0') + 6;
-                    f.style.top = top + 'px';
-                    const left = parseFloat(f.style.left || '0');
-                    if (top > area.clientHeight - 26 && left > bx - 20 && left < bx + 72) {
-                        score += 1;
-                        updateScore();
-                        f.remove();
-                        fruits.splice(i, 1);
-                    } else if (top > area.clientHeight + 20) {
-                        f.remove();
-                        fruits.splice(i, 1);
-                    }
-                }
-            }, 60);
-
-            registerCleanup(() => {
-                clearInterval(spawnIv);
-                clearInterval(stepIv);
-                area.removeEventListener('keydown', keyHandler);
-                fruits.forEach(f => f.remove());
-                basket.remove();
-            });
-            startCountdown(30);
-        }
-
-        function startCountdown(seconds) {
-            clearGlobalTimer();
-            setTime(seconds);
-            gameRunning = true;
-            startBtn.disabled = true;
-            stopBtn.disabled = false;
-            timer = setInterval(() => {
-                if (!gameRunning) return;
-                timeLeft -= 1;
-                renderTime();
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    timer = null;
-                    endRound('Czas minął!');
-                }
-            }, 1000);
-            registerCleanup(() => { clearInterval(timer); timer = null; });
-        }
-
-        function endRound(msg) {
-            saveHighScore(currentGame, score);
-            runCleanup();
-            clearGlobalTimer();
-            gameRunning = false;
-            startBtn.disabled = false;
-            stopBtn.disabled = true;
-            setGameMessage(msg + ' Wynik: ' + score);
-        }
-
-        function startGame() {
-            if (gameRunning) return;
-            score = 0;
-            updateScore();
-            updateGameName();
-            switch (currentGame) {
-                case 'clickTarget': startClickTarget(); break;
-                case 'rapidClick': startRapidClick(); break;
-                case 'reaction': startReaction(); break;
-                case 'whack': startWhack(); break;
-                case 'math': startMath(); break;
-                case 'simon': startSimon(); break;
-                case 'balloon': startBalloon(); break;
-                case 'colorMatch': startColorMatch(); break;
-                case 'numberFind': startNumberFind(); break;
-                case 'dodger': startDodger(); break;
-                case 'blackjack': startBlackjack(); break;
-                case 'slots': startSlots(); break;
-                case 'hangman': startHangman(); break;
-                case 'typing': startTyping(); break;
-                case 'higherLower': startHigherLower(); break;
-                case 'memoryPairs': startMemoryPairs(); break;
-                case 'luckySpin': startLuckySpin(); break;
-                case 'fruitCatcher': startFruitCatcher(); break;
-                default: setGameMessage('Brak gry');
-            }
-        }
-
-        function applyTheme() {
-            document.body.classList.toggle('theme-light', !darkTheme);
-            toggleThemeBtn.textContent = darkTheme ? 'Motyw: Dark' : 'Motyw: Light';
-            localStorage.setItem('hackathon.darkTheme', darkTheme ? 'true' : 'false');
-        }
-
-        startBtn.addEventListener('click', startGame);
-        stopBtn.addEventListener('click', () => stopGame());
-        resetBtn.addEventListener('click', resetKeepSelection);
-
-        toggleSoundBtn.addEventListener('click', () => {
-            soundOn = !soundOn;
-            localStorage.setItem('hackathon.soundOn', soundOn ? 'true' : 'false');
-            toggleSoundBtn.textContent = 'Dźwięk: ' + (soundOn ? 'ON' : 'OFF');
+          }
         });
 
-        toggleThemeBtn.addEventListener('click', () => {
-            darkTheme = !darkTheme;
-            applyTheme();
+        const blocks = [
+          { x: 0, y: 0, w: 2200, h: 130 },
+          { x: 0, y: 260, w: 200, h: 170 },
+          { x: 0, y: 560, w: 200, h: 220 },
+          { x: 0, y: 910, w: 200, h: 220 },
+          { x: 0, y: 1260, w: 200, h: 340 },
+          { x: 1880, y: 260, w: 320, h: 170 },
+          { x: 1880, y: 560, w: 320, h: 220 },
+          { x: 1880, y: 910, w: 320, h: 220 },
+          { x: 1880, y: 1260, w: 320, h: 340 }
+        ];
+
+        blocks.forEach((b) => {
+          const shade = Phaser.Display.Color.GetColor(
+            32 + Math.random() * 20,
+            52 + Math.random() * 25,
+            60 + Math.random() * 25
+          );
+          g.fillStyle(shade, 1);
+          g.fillRoundedRect(b.x, b.y, b.w, b.h, 10);
+          g.fillStyle(0x0a0f16, 0.35);
+          g.fillRect(b.x + 18, b.y + 18, b.w - 36, b.h - 36);
         });
 
-        renderGames();
-        updateGameName();
-        renderHighScores();
-        updateScore();
-        toggleSoundBtn.textContent = 'Dźwięk: ' + (soundOn ? 'ON' : 'OFF');
-        applyTheme();
-    </script>
+        for (let i = 0; i < 70; i++) {
+          const x = 120 + Math.random() * (this.worldWidth - 240);
+          const y = 120 + Math.random() * (this.worldHeight - 240);
+          g.fillStyle(Phaser.Display.Color.GetColor(25, 120, 60), 1);
+          g.fillCircle(x, y, 6);
+        }
+      }
+
+      createPlayer() {
+        const g = this.make.graphics({ add: false });
+        g.fillStyle(0x2bd7ff, 1);
+        g.fillRoundedRect(0, 0, 120, 60, 16);
+        g.fillStyle(0xeafcff, 0.9);
+        for (let i = 0; i < 4; i++) {
+          g.fillRoundedRect(16 + i * 26, 10, 16, 16, 4);
+        }
+        g.fillStyle(0x0d1320, 1);
+        g.fillRoundedRect(10, 18, 12, 12, 3);
+        g.fillRoundedRect(98, 18, 12, 12, 3);
+        g.fillRoundedRect(10, 30, 12, 12, 3);
+        g.fillRoundedRect(98, 30, 12, 12, 3);
+        g.generateTexture('busBody', 120, 60);
+        g.destroy();
+
+        this.player = this.physics.add.sprite(280, 250, 'busBody');
+        this.player.setCollideWorldBounds(true);
+        this.player.setDepth(30);
+        this.player.setDrag(200);
+        this.player.setBounce(0.05);
+        this.player.body.setSize(110, 40);
+        this.player.angle = 90;
+        this.player.speed = 0;
+        this.player.fuel = 100;
+
+        this.cameras.main.startFollow(this.player, true, 0.09, 0.09);
+      }
+
+      createStops() {
+        this.stops = [
+          { id: 'stationA', name: 'Dworzec', x: 280, y: 220, waiting: true },
+          { id: 'stationB', name: 'Rondo', x: 990, y: 240, waiting: true },
+          { id: 'stationC', name: 'Park', x: 680, y: 890, waiting: true },
+          { id: 'stationD', name: 'Centrum', x: 1550, y: 1020, waiting: true },
+          { id: 'stationE', name: 'Port', x: 1980, y: 470, waiting: true },
+          { id: 'stationF', name: 'Muzeum', x: 1480, y: 1310, waiting: true }
+        ];
+
+        this.stopSprites = [];
+        this.stops.forEach((s) => {
+          const ring = this.add.circle(s.x, s.y, 22, 0x5ee7ff, 0.2);
+          const dot = this.add.circle(s.x, s.y, 11, 0x5ee7ff, 1);
+          const label = this.add.text(s.x, s.y + 36, s.name, {
+            font: 'bold 12px Inter, Segoe UI, sans-serif',
+            color: '#dff7ff',
+            backgroundColor: 'rgba(3, 9, 15, 0.5)',
+            padding: { x: 6, y: 2 }
+          }).setOrigin(0.5);
+          this.stopSprites.push({ ring, dot, label, ...s });
+        });
+      }
+
+      createRoadDecor() {
+        const treeG = this.make.graphics({ add: false });
+        treeG.fillStyle(0x12a66d, 1);
+        treeG.fillCircle(0, 0, 20);
+        treeG.generateTexture('tree', 40, 40);
+        treeG.destroy();
+
+        for (let i = 0; i < 30; i++) {
+          const x = 240 + Math.random() * (this.worldWidth - 480);
+          const y = 200 + Math.random() * (this.worldHeight - 400);
+          if (this.roadRects.some(r => Phaser.Geom.Rectangle.Contains(r, x, y))) {
+            continue;
+          }
+          this.add.image(x, y, 'tree').setScale(0.8 + Math.random() * 0.5).setDepth(5);
+        }
+      }
+
+      createTraffic() {
+        this.trafficCars = [];
+        const laneConfigs = [
+          { x: 470, y: 205, dir: 1, color: 0xffb703 },
+          { x: 990, y: 205, dir: 1, color: 0xff7d50 },
+          { x: 1460, y: 205, dir: 1, color: 0x7dd3fc },
+          { x: 1800, y: 520, dir: -1, color: 0x8b5cf6 },
+          { x: 1080, y: 890, dir: 1, color: 0x34d399 },
+          { x: 1580, y: 890, dir: 1, color: 0x38bdf8 },
+          { x: 1030, y: 1250, dir: -1, color: 0xf97316 },
+          { x: 700, y: 1250, dir: -1, color: 0xfbbf24 }
+        ];
+
+        const graphics = this.make.graphics({ add: false });
+        graphics.fillStyle(0x111827, 1);
+        graphics.fillRoundedRect(0, 0, 48, 26, 8);
+        graphics.fillStyle(0xffffff, 1);
+        graphics.fillRoundedRect(14, 6, 18, 8, 2);
+        graphics.generateTexture('trafficCar', 48, 26);
+        graphics.destroy();
+
+        laneConfigs.forEach((cfg, i) => {
+          const car = this.physics.add.sprite(cfg.x, cfg.y, 'trafficCar');
+          car.setTint(cfg.color);
+          car.setDepth(12);
+          car.setImmovable(true);
+          car.body.setAllowGravity(false);
+          car.direction = cfg.dir;
+          car.speed = 55 + i * 12;
+          car.setSize(44, 20);
+          this.trafficCars.push(car);
+        });
+      }
+
+      createInput() {
+        this.cursorKeys = this.input.keyboard.createCursorKeys();
+        this.keys = this.input.keyboard.addKeys({
+          W: Phaser.Input.Keyboard.KeyCodes.W,
+          A: Phaser.Input.Keyboard.KeyCodes.A,
+          S: Phaser.Input.Keyboard.KeyCodes.S,
+          D: Phaser.Input.Keyboard.KeyCodes.D,
+          E: Phaser.Input.Keyboard.KeyCodes.E,
+          SHIFT: Phaser.Input.Keyboard.KeyCodes.SHIFT
+        });
+      }
+
+      updateHud() {
+        scoreEl.textContent = this.score;
+        timeEl.textContent = String(Math.max(0, this.timeLeft));
+        passengerEl.textContent = String(this.passengerCount);
+        fuelEl.textContent = `${Math.round(this.fuel)}%`;
+        missionTextEl.textContent = this.currentMission || 'Zbieraj pasażerów i dowoź ich do punktów docelowych.';
+      }
+
+      getNearestStop() {
+        let best = null;
+        let bestDist = Infinity;
+        this.stops.forEach((stop) => {
+          const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, stop.x, stop.y);
+          if (d < bestDist && d < 85) {
+            bestDist = d;
+            best = stop;
+          }
+        });
+        return best;
+      }
+
+      attemptPickupOrDrop() {
+        const stop = this.getNearestStop();
+        if (!stop) return;
+
+        if (this.activePassenger && stop.id === this.activePassenger.to) {
+          this.score += 120 + this.activePassenger.multiplier * 25;
+          this.passengerCount = Math.max(0, this.passengerCount - 1);
+          this.activePassenger = null;
+          this.currentMission = 'Misja zakończona! Jedź dalej.';
+          this.updateHud();
+          return;
+        }
+
+        if (!this.activePassenger && stop.waiting) {
+          const validStops = this.stops.filter(s => s.id !== stop.id);
+          const target = Phaser.Utils.Array.GetRandom(validStops);
+          this.activePassenger = {
+            from: stop.id,
+            to: target.id,
+            multiplier: 1 + Math.floor(Math.random() * 4),
+            destinationName: target.name
+          };
+          stop.waiting = false;
+          this.passengerCount += 1;
+          this.currentMission = `Pasażer: ${stop.name} → ${target.name}`;
+          this.updateHud();
+          return;
+        }
+      }
+
+      endGame() {
+        this.gameOver = true;
+        this.currentMission = 'Koniec gry — kliknij Restart i zacznij od nowa.';
+        this.updateHud();
+        this.cameras.main.shake(220, 0.016);
+      }
+
+      update(time, delta) {
+        if (this.gameOver) return;
+
+        const dt = delta / 1000;
+        const left = this.cursorKeys.left.isDown || this.keys.A.isDown;
+        const right = this.cursorKeys.right.isDown || this.keys.D.isDown;
+        const accelerate = this.cursorKeys.up.isDown || this.keys.W.isDown;
+        const brake = this.cursorKeys.down.isDown || this.keys.S.isDown;
+        const boost = this.keys.SHIFT.isDown;
+        const pickupButton = Phaser.Input.Keyboard.JustDown(this.keys.E);
+
+        if (pickupButton) {
+          this.attemptPickupOrDrop();
+        }
+
+        const maxSpeed = boost ? 380 : 255;
+        if (accelerate) this.player.speed += 190 * dt;
+        if (brake) this.player.speed -= 260 * dt;
+        if (!accelerate && !brake) this.player.speed *= 0.985;
+
+        const turnPower = Phaser.Math.Clamp(Math.abs(this.player.speed) / maxSpeed, 0.2, 1);
+        if (left) this.player.rotation -= 1.5 * dt * turnPower;
+        if (right) this.player.rotation += 1.5 * dt * turnPower;
+
+        this.player.speed = Phaser.Math.Clamp(this.player.speed, -75, maxSpeed);
+
+        const isOnRoad = this.roadRects.some((r) => Phaser.Geom.Rectangle.Contains(r, this.player.x, this.player.y));
+        if (!isOnRoad) {
+          this.player.speed *= 0.96;
+          if (this.player.speed < 0.5) this.player.speed = 0;
+        }
+
+        this.player.x += Math.cos(this.player.rotation) * this.player.speed * dt;
+        this.player.y += Math.sin(this.player.rotation) * this.player.speed * dt;
+
+        this.player.x = Phaser.Math.Clamp(this.player.x, 70, this.worldWidth - 70);
+        this.player.y = Phaser.Math.Clamp(this.player.y, 70, this.worldHeight - 70);
+
+        this.stopSprites.forEach((stop) => {
+          const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, stop.x, stop.y);
+          if (dist < 36) {
+            stop.ring.setFillStyle(0x5ee7ff, 0.45);
+            stop.dot.setScale(1.12);
+          } else {
+            stop.ring.setFillStyle(0x5ee7ff, 0.2);
+            stop.dot.setScale(1);
+          }
+        });
+
+        this.trafficCars.forEach((car) => {
+          car.x += car.direction * car.speed * dt;
+          if (car.x < 110 || car.x > this.worldWidth - 110) {
+            car.direction *= -1;
+          }
+          const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, car.x, car.y);
+          if (dist < 48) {
+            this.player.speed *= 0.62;
+            this.fuel = Phaser.Math.Clamp(this.fuel - 8, 0, 100);
+            this.score = Math.max(0, this.score - 15);
+            this.cameras.main.shake(80, 0.012);
+          }
+        });
+
+        if (Math.abs(this.player.speed) > 90) {
+          this.fuel = Phaser.Math.Clamp(this.fuel - dt * 6, 0, 100);
+        }
+
+        if (this.fuel <= 0) {
+          this.endGame();
+        }
+
+        this.updateHud();
+      }
+    }
+
+    const config = {
+      type: Phaser.AUTO,
+      width: 1280,
+      height: 720,
+      parent: 'game-root',
+      backgroundColor: '#06131d',
+      scene: [CityBusScene],
+      physics: {
+        default: 'arcade',
+        arcade: { debug: false, gravity: { y: 0 } }
+      },
+      render: { antialias: true, pixelArt: false }
+    };
+
+    const game = new Phaser.Game(config);
+    restartBtn.addEventListener('click', () => {
+      window.location.reload();
+    });
+  </script>
 </body>
 </html>
