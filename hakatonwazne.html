@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Hackathon event landing page with mini game">
-    <title>Hackathon Challenge</title>
+    <meta name="description" content="Hackathon event landing page with mini games">
+    <title>Hackathon Challenge — Mini gry</title>
     <style>
         :root {
             --bg: #f3f7ff;
@@ -14,16 +14,24 @@
             --accent: #22c55e;
             --text: #1f2937;
             --muted: #64748b;
+            --card: #eef2ff;
         }
 
         * { box-sizing: border-box; }
 
-        body {
+        html, body {
             margin: 0;
+            height: 100%;
+        }
+
+        body {
             font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #eef4ff 0%, #f8fbff 100%);
             color: var(--text);
             line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         header {
@@ -38,45 +46,89 @@
             font-size: clamp(2rem, 4vw, 3rem);
         }
 
-        main {
-            max-width: 760px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-
-        section {
-            background: var(--panel);
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-            padding: 1.5rem;
-        }
-
         .subtitle {
             margin-top: 0.5rem;
-            color: var(--muted);
+            color: #cbd5e1;
             text-align: center;
+            font-size: 1rem;
         }
 
-        .game-box {
-            margin-top: 1.5rem;
+        .layout {
+            width: min(1200px, calc(100% - 2rem));
+            margin: 2rem auto;
+            display: grid;
+            grid-template-columns: 290px 1fr;
+            gap: 1.25rem;
+            align-items: start;
+        }
+
+        .panel {
+            background: var(--panel);
+            border-radius: 18px;
+            box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+            padding: 1.2rem;
+        }
+
+        .games-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+            max-height: 70vh;
+            overflow: auto;
+            padding-right: 0.2rem;
+        }
+
+        .game-item {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.8rem 0.9rem;
+            border-radius: 12px;
+            background: linear-gradient(180deg, var(--card), #fff);
             border: 1px solid #dfe7f5;
-            border-radius: 14px;
-            padding: 1rem;
-            background: #f9fbff;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
 
-        .game-top {
+        .game-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.08);
+        }
+
+        .game-item.active {
+            border-color: rgba(37, 99, 235, 0.45);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+        }
+
+        .game-item strong {
+            display: block;
+            margin-bottom: 0.2rem;
+            font-size: 1rem;
+        }
+
+        .game-item small {
+            color: var(--muted);
+        }
+
+        .game-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 1rem;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.9rem;
             flex-wrap: wrap;
         }
 
         .scoreboard {
             font-weight: 700;
             color: var(--dark);
+            font-size: 1rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
         }
 
         button {
@@ -84,7 +136,7 @@
             color: white;
             border: none;
             border-radius: 10px;
-            padding: 0.7rem 1rem;
+            padding: 0.75rem 1rem;
             font-size: 0.95rem;
             cursor: pointer;
             transition: 0.2s ease;
@@ -94,21 +146,47 @@
             background: #1d4ed8;
         }
 
+        button.secondary {
+            background: #64748b;
+        }
+
+        button.secondary:hover {
+            background: #475569;
+        }
+
+        button.ghost {
+            background: transparent;
+            border: 1px solid #dfe7f5;
+            color: var(--dark);
+        }
+
+        button.ghost:hover {
+            background: #f8fafc;
+        }
+
         button:disabled {
             opacity: 0.7;
             cursor: not-allowed;
         }
 
-        .game-area {
+        .game-stage {
             position: relative;
             width: 100%;
-            max-width: 420px;
-            height: 220px;
-            margin: 0 auto;
-            border-radius: 12px;
-            background: linear-gradient(180deg, #e2e8f0, #f8fafc);
-            border: 2px solid #cbd5e1;
+            min-height: 420px;
+            border: 1px solid #dfe7f5;
+            border-radius: 16px;
+            background: linear-gradient(180deg, #f8fafc, #ffffff);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             overflow: hidden;
+        }
+
+        .state-message {
+            color: var(--muted);
+            text-align: center;
+            font-size: 1.05rem;
         }
 
         .target {
@@ -129,41 +207,248 @@
             border: 3px solid rgba(255,255,255,0.8);
             border-radius: 8px;
         }
+
+        .mini-board {
+            width: 100%;
+            min-height: 330px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: linear-gradient(180deg, #edf5ff, #f8fbff);
+            border: 1px solid #dfe7f5;
+        }
+
+        .mole {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fbbf24, #f59e0b 55%, #d97706);
+            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.35);
+            cursor: pointer;
+        }
+
+        .holes {
+            display: grid;
+            grid-template-columns: repeat(3, 90px);
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hole {
+            width: 90px;
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            border: 1px solid #dfe7f5;
+            background: rgba(255,255,255,0.8);
+        }
+
+        .pad {
+            width: 112px;
+            height: 112px;
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 -8px 0 rgba(0,0,0,0.06);
+            cursor: pointer;
+        }
+
+        .pad.red { background: #ef4444; }
+        .pad.yellow { background: #f59e0b; }
+        .pad.green { background: #10b981; }
+        .pad.blue { background: #3b82f6; }
+
+        .balloon {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 82px;
+            height: 100px;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            background: radial-gradient(circle at 30% 30%, #f9a8d4, #ec4899 60%, #db2777);
+            box-shadow: 0 10px 28px rgba(236,72,153,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .balloon::after {
+            content: "";
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background: rgba(20,20,20,0.3);
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .dodger-area {
+            position: relative;
+            width: 100%;
+            height: 330px;
+            background: linear-gradient(180deg, #eaf2ff, #f9fbff);
+            border-radius: 12px;
+            border: 1px solid #dfe7f5;
+            overflow: hidden;
+        }
+
+        .player {
+            position: absolute;
+            width: 64px;
+            height: 24px;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(180deg, #2563eb, #1d4ed8);
+            border-radius: 8px;
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.3);
+        }
+
+        .fall {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(180deg, #f97316, #ea580c);
+            border-radius: 6px;
+            box-shadow: 0 8px 20px rgba(234, 88, 12, 0.25);
+        }
+
+        .quiz-box {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            align-items: center;
+        }
+
+        .question {
+            font-size: clamp(1.25rem, 2vw, 1.8rem);
+            font-weight: 700;
+        }
+
+        .quiz-box input {
+            padding: 0.75rem 0.9rem;
+            border: 1px solid #dfe7f5;
+            border-radius: 10px;
+            font-size: 1rem;
+            width: min(180px, 70%);
+        }
+
+        .choices {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+            justify-content: center;
+        }
+
+        .color-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 14px;
+            border: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .number-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 84px);
+            gap: 0.8rem;
+            justify-content: center;
+        }
+
+        .number-item {
+            width: 84px;
+            height: 84px;
+            border-radius: 14px;
+            border: 1px solid #dfe7f5;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .games-list {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+                max-height: none;
+            }
+        }
     </style>
 </head>
 <body>
     <header>
         <h1>Hackathon</h1>
+        <p class="subtitle">Wybierz jedną z 10 mini gier i zacznij zabawę</p>
     </header>
 
-    <main>
-        <section>
-            <p class="subtitle">Welcome to the Hackathon challenge</p>
+    <div class="layout">
+        <aside class="panel">
+            <h3>Wybór gry</h3>
+            <div class="games-list" id="gamesList"></div>
+        </aside>
 
-            <div class="game-box">
-                <div class="game-top">
-                    <div class="scoreboard">Score: <span id="score">0</span></div>
-                    <div class="scoreboard">Time: <span id="time">15</span>s</div>
+        <main class="panel">
+            <div class="game-header">
+                <div class="scoreboard">Score: <span id="score">0</span></div>
+                <div class="scoreboard">Time: <span id="time">--</span></div>
+                <div class="controls">
                     <button id="startBtn">Start game</button>
-                </div>
-
-                <div class="game-area" id="gameArea" aria-label="Mini game area">
-                    <div class="target" id="target" aria-label="Target"></div>
+                    <button id="stopBtn" class="secondary">Stop</button>
+                    <button id="resetBtn" class="ghost">Reset</button>
                 </div>
             </div>
-        </section>
-    </main>
+
+            <div class="game-stage" id="gameStage">
+                <div class="state-message">Wybierz grę po lewej, a potem kliknij Start</div>
+            </div>
+        </main>
+    </div>
 
     <script>
-        const scoreEl = document.getElementById("score");
-        const timeEl = document.getElementById("time");
-        const startBtn = document.getElementById("startBtn");
-        const gameArea = document.getElementById("gameArea");
-        const target = document.getElementById("target");
+        const games = [
+            { id: 'clickTarget', name: 'Click Target', desc: 'Klikaj ruchomy cel' },
+            { id: 'rapidClick', name: 'Rapid Click', desc: 'Klikaj jak najwięcej' },
+            { id: 'reaction', name: 'Reaction Test', desc: 'Test reakcji' },
+            { id: 'whack', name: 'Whack-a-Mole', desc: 'Uderz kreta' },
+            { id: 'math', name: 'Math Quiz', desc: 'Rozwiąż działania' },
+            { id: 'simon', name: 'Simon Memory', desc: 'Powtarzaj sekwencję' },
+            { id: 'balloon', name: 'Balloon Pop', desc: 'Przebij balon' },
+            { id: 'colorMatch', name: 'Color Match', desc: 'Dopasuj kolor' },
+            { id: 'numberFind', name: 'Find Numbers', desc: 'Klikaj liczby w kolejności' },
+            { id: 'dodger', name: 'Dodger', desc: 'Omijaj spadające obiekty' }
+        ];
+
+        const scoreEl = document.getElementById('score');
+        const timeEl = document.getElementById('time');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const gameStage = document.getElementById('gameStage');
+        const gamesList = document.getElementById('gamesList');
 
         let score = 0;
-        let timeLeft = 15;
+        let timeLeft = 0;
         let gameRunning = false;
+        let currentGame = 'clickTarget';
         let intervalId = null;
 
         function updateScore() {
@@ -171,61 +456,494 @@
         }
 
         function updateTime() {
-            timeEl.textContent = timeLeft;
+            timeEl.textContent = timeLeft === null ? '--' : `${timeLeft}s`;
         }
 
-        function moveTarget() {
-            const areaWidth = gameArea.clientWidth - 52;
-            const areaHeight = gameArea.clientHeight - 52;
-
-            const x = Math.random() * areaWidth;
-            const y = Math.random() * areaHeight;
-
-            target.style.left = x + "px";
-            target.style.top = y + "px";
+        function setGameMessage(text) {
+            gameStage.innerHTML = `<div class="state-message">${text}</div>`;
         }
 
-        function endGame() {
-            clearInterval(intervalId);
+        function renderGamesList() {
+            gamesList.innerHTML = '';
+            games.forEach((game) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'game-item' + (game.id === currentGame ? ' active' : '');
+                btn.innerHTML = `<div><strong>${game.name}</strong><small>${game.desc}</small></div>`;
+                btn.addEventListener('click', () => selectGame(game.id));
+                gamesList.appendChild(btn);
+            });
+        }
+
+        function selectGame(id) {
+            currentGame = id;
+            renderGamesList();
+            resetGameState();
+            setGameMessage('Gracz wybrany. Kliknij Start, aby zagrać.');
+        }
+
+        function clearIntervalSafe() {
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+        }
+
+        function resetGameState() {
+            clearIntervalSafe();
             gameRunning = false;
-            startBtn.disabled = false;
-            startBtn.textContent = "Play again";
-            target.style.display = "none";
-            alert("Game over! Your score: " + score);
-        }
-
-        function startGame() {
             score = 0;
-            timeLeft = 15;
+            timeLeft = 0;
             updateScore();
             updateTime();
+            startBtn.disabled = false;
+            stopBtn.disabled = false;
+        }
 
-            gameRunning = true;
-            startBtn.disabled = true;
-            startBtn.textContent = "In progress...";
+        function endGame(msg) {
+            clearIntervalSafe();
+            gameRunning = false;
+            startBtn.disabled = false;
+            stopBtn.disabled = false;
+            alert(msg || `Game over! Your score: ${score}`);
+        }
 
-            target.style.display = "block";
-            moveTarget();
-
+        function startTimer(seconds) {
+            timeLeft = seconds;
+            updateTime();
+            clearIntervalSafe();
             intervalId = setInterval(() => {
                 timeLeft -= 1;
                 updateTime();
-
                 if (timeLeft <= 0) {
-                    endGame();
+                    endGame(`Koniec gry! Twój wynik: ${score}`);
+                    return;
                 }
             }, 1000);
         }
 
-        startBtn.addEventListener("click", startGame);
-
-        target.addEventListener("click", () => {
-            if (!gameRunning) return;
-
-            score += 1;
+        function startGame() {
+            if (gameRunning) return;
+            gameRunning = true;
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            score = 0;
             updateScore();
-            moveTarget();
+
+            switch (currentGame) {
+                case 'clickTarget': startClickTarget(); break;
+                case 'rapidClick': startRapidClick(); break;
+                case 'reaction': startReaction(); break;
+                case 'whack': startWhack(); break;
+                case 'math': startMath(); break;
+                case 'simon': startSimon(); break;
+                case 'balloon': startBalloon(); break;
+                case 'colorMatch': startColorMatch(); break;
+                case 'numberFind': startNumberFind(); break;
+                case 'dodger': startDodger(); break;
+                default: setGameMessage('Brak gry.');
+            }
+        }
+
+        function stopGame() {
+            if (!gameRunning) return;
+            clearIntervalSafe();
+            gameRunning = false;
+            startBtn.disabled = false;
+            stopBtn.disabled = false;
+            alert(`Gra zatrzymana. Twój wynik: ${score}`);
+        }
+
+        function startClickTarget() {
+            gameStage.innerHTML = '<div class="mini-board" id="targetBoard"></div>';
+            const board = document.getElementById('targetBoard');
+            const target = document.createElement('div');
+            target.className = 'target';
+            target.id = 'clickTargetNode';
+            board.appendChild(target);
+
+            startTimer(15);
+            target.style.display = 'block';
+            moveTarget(target, board);
+
+            target.addEventListener('click', () => {
+                if (!gameRunning) return;
+                score += 1;
+                updateScore();
+                moveTarget(target, board);
+            });
+        }
+
+        function moveTarget(target, board) {
+            const width = board.clientWidth - 52;
+            const height = board.clientHeight - 52;
+            const x = Math.random() * width;
+            const y = Math.random() * height;
+            target.style.left = x + 'px';
+            target.style.top = y + 'px';
+        }
+
+        function startRapidClick() {
+            gameStage.innerHTML = `
+                <div class="mini-board">
+                    <button id="rapidBtn" style="padding: 1.2rem 2rem; font-size: 1.4rem;">CLICK!</button>
+                </div>
+            `;
+            const btn = document.getElementById('rapidBtn');
+            startTimer(10);
+            btn.addEventListener('click', () => {
+                if (!gameRunning) return;
+                score += 1;
+                updateScore();
+            });
+        }
+
+        function startReaction() {
+            gameStage.innerHTML = '<div class="mini-board"><div class="state-message" id="reactionMsg">Kliknij Start i czekaj na zielony kolor</div></div>';
+            const msg = document.getElementById('reactionMsg');
+            let startedAt = 0;
+            let canClick = false;
+
+            setTimeout(() => {
+                if (!gameRunning) return;
+                msg.textContent = 'KLIK!';
+                msg.style.color = '#16a34a';
+                msg.style.fontWeight = '700';
+                msg.style.fontSize = '1.5rem';
+                startedAt = performance.now();
+                canClick = true;
+            }, 1200 + Math.random() * 2000);
+
+            gameStage.addEventListener('click', function reactionHandler(event) {
+                if (!canClick || !gameRunning) return;
+                const reactionTime = Math.round(performance.now() - startedAt);
+                score = reactionTime;
+                updateScore();
+                endGame(`Twój czas reakcji: ${reactionTime} ms`);
+                gameStage.removeEventListener('click', reactionHandler);
+            });
+        }
+
+        function startWhack() {
+            gameStage.innerHTML = '<div class="mini-board"><div class="holes" id="holeGrid"></div></div>';
+            const grid = document.getElementById('holeGrid');
+            const holes = [];
+
+            for (let i = 0; i < 9; i++) {
+                const hole = document.createElement('div');
+                hole.className = 'hole';
+                holes.push(hole);
+                grid.appendChild(hole);
+            }
+
+            startTimer(20);
+            let moleTimer = setInterval(() => {
+                if (!gameRunning) {
+                    clearInterval(moleTimer);
+                    return;
+                }
+                const idx = Math.floor(Math.random() * holes.length);
+                holes.forEach((h) => h.innerHTML = '');
+                const mole = document.createElement('div');
+                mole.className = 'mole';
+                mole.addEventListener('click', () => {
+                    if (!gameRunning) return;
+                    score += 1;
+                    updateScore();
+                    h.innerHTML = '';
+                });
+                let h = holes[idx];
+                h.appendChild(mole);
+            }, 800);
+
+            const stopMole = () => clearInterval(moleTimer);
+            stopBtn.addEventListener('click', stopMole, { once: true });
+        }
+
+        function startMath() {
+            gameStage.innerHTML = `
+                <div class="mini-board">
+                    <div class="quiz-box">
+                        <div class="question" id="mathQuestion"></div>
+                        <input id="mathInput" type="number" placeholder="Wpisz wynik" />
+                        <button id="mathSubmit">Sprawdź</button>
+                    </div>
+                </div>
+            `;
+            const questionEl = document.getElementById('mathQuestion');
+            const inputEl = document.getElementById('mathInput');
+            const submitBtn = document.getElementById('mathSubmit');
+            let correct = 0;
+
+            function generateQuestion() {
+                const a = Math.floor(Math.random() * 10) + 1;
+                const b = Math.floor(Math.random() * 10) + 1;
+                const op = Math.random() < 0.5 ? '+' : '-';
+                correct = op === '+' ? a + b : a - b;
+                questionEl.textContent = `${a} ${op} ${b} = ?`;
+                inputEl.value = '';
+                inputEl.focus();
+            }
+
+            generateQuestion();
+            startTimer(30);
+            submitBtn.addEventListener('click', () => {
+                if (!gameRunning) return;
+                const answer = Number(inputEl.value);
+                if (answer === correct) {
+                    score += 1;
+                    updateScore();
+                    generateQuestion();
+                }
+            });
+        }
+
+        function startSimon() {
+            gameStage.innerHTML = `
+                <div class="mini-board">
+                    <div class="choices">
+                        <button class="pad red" data-color="red"></button>
+                        <button class="pad yellow" data-color="yellow"></button>
+                        <button class="pad green" data-color="green"></button>
+                        <button class="pad blue" data-color="blue"></button>
+                    </div>
+                </div>
+            `;
+            const pads = [...document.querySelectorAll('.pad')];
+            const sequence = [];
+            let playerIndex = 0;
+            let isPlayingSequence = false;
+            const colors = ['red', 'yellow', 'green', 'blue'];
+
+            function flash(color) {
+                const pad = pads.find(p => p.dataset.color === color);
+                if (!pad) return;
+                pad.style.filter = 'brightness(1.3)';
+                setTimeout(() => pad.style.filter = 'brightness(1)', 350);
+            }
+
+            function playSequence() {
+                isPlayingSequence = true;
+                sequence.forEach((color, index) => {
+                    setTimeout(() => flash(color), index * 500);
+                });
+                setTimeout(() => { isPlayingSequence = false; }, sequence.length * 550);
+            }
+
+            function addStep() {
+                sequence.push(colors[Math.floor(Math.random() * colors.length)]);
+                playerIndex = 0;
+                playSequence();
+            }
+
+            addStep();
+
+            pads.forEach((pad) => {
+                pad.addEventListener('click', () => {
+                    if (!gameRunning || isPlayingSequence) return;
+                    const chosen = pad.dataset.color;
+                    flash(chosen);
+                    if (chosen !== sequence[playerIndex]) {
+                        endGame(`Błąd! Ostateczny wynik: ${score}`);
+                        return;
+                    }
+
+                    playerIndex += 1;
+                    if (playerIndex === sequence.length) {
+                        score += 1;
+                        updateScore();
+                        setTimeout(addStep, 650);
+                    }
+                });
+            });
+
+            gameRunning = true;
+            startTimer(25);
+        }
+
+        function startBalloon() {
+            gameStage.innerHTML = '<div class="mini-board" id="balloonBoard"></div>';
+            const board = document.getElementById('balloonBoard');
+            const balloonEl = document.createElement('div');
+            balloonEl.className = 'balloon';
+            balloonEl.textContent = 'POP';
+            board.appendChild(balloonEl);
+            let position = 20;
+
+            startTimer(20);
+            setInterval(() => {
+                if (!gameRunning) return;
+                position += 8;
+                balloonEl.style.bottom = position + 'px';
+                if (position > 220) {
+                    endGame(`Balony uciekły! Wynik: ${score}`);
+                }
+            }, 500);
+
+            balloonEl.addEventListener('click', () => {
+                if (!gameRunning) return;
+                score += 1;
+                updateScore();
+                position = 20;
+                balloonEl.style.bottom = position + 'px';
+            });
+        }
+
+        function startColorMatch() {
+            gameStage.innerHTML = `
+                <div class="mini-board">
+                    <div class="quiz-box">
+                        <div class="question" id="colorText">ZIELONY</div>
+                        <div class="choices" id="colorChoices"></div>
+                    </div>
+                </div>
+            `;
+            const colorText = document.getElementById('colorText');
+            const choices = document.getElementById('colorChoices');
+            const palette = [
+                { name: 'Czerwony', value: '#ef4444' },
+                { name: 'Zielony', value: '#10b981' },
+                { name: 'Niebieski', value: '#3b82f6' },
+                { name: 'Żółty', value: '#f59e0b' }
+            ];
+
+            function drawRound() {
+                const target = palette[Math.floor(Math.random() * palette.length)];
+                colorText.textContent = target.name;
+                colorText.style.color = target.value;
+                const order = [...palette].sort(() => 0.5 - Math.random());
+                choices.innerHTML = '';
+                order.forEach(item => {
+                    const btn = document.createElement('button');
+                    btn.className = 'color-btn';
+                    btn.style.background = item.value;
+                    btn.addEventListener('click', () => {
+                        if (!gameRunning) return;
+                        if (item.name === target.name) {
+                            score += 1;
+                            updateScore();
+                            drawRound();
+                        }
+                    });
+                    choices.appendChild(btn);
+                });
+            }
+
+            drawRound();
+            startTimer(20);
+        }
+
+        function startNumberFind() {
+            gameStage.innerHTML = '<div class="mini-board"><div class="number-grid" id="numberGrid"></div></div>';
+            const grid = document.getElementById('numberGrid');
+            const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+            let nextNumber = 1;
+
+            numbers.sort(() => Math.random() - 0.5);
+            numbers.forEach((num) => {
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.className = 'number-item';
+                item.textContent = num;
+                item.addEventListener('click', () => {
+                    if (!gameRunning) return;
+                    if (num === nextNumber) {
+                        score += 1;
+                        updateScore();
+                        item.style.opacity = '0.3';
+                        nextNumber += 1;
+                        if (nextNumber > 9) {
+                            endGame(`Wszystkie liczby znalezione! Wynik: ${score}`);
+                        }
+                    }
+                });
+                grid.appendChild(item);
+            });
+
+            startTimer(30);
+        }
+
+        function startDodger() {
+            gameStage.innerHTML = '<div class="dodger-area" id="dodgerArea" tabindex="0"></div>';
+            const area = document.getElementById('dodgerArea');
+            const player = document.createElement('div');
+            player.className = 'player';
+            area.appendChild(player);
+
+            let playerX = area.clientWidth / 2 - 32;
+            player.style.left = playerX + 'px';
+
+            const handleMove = (event) => {
+                if (!gameRunning) return;
+                if (event.key === 'ArrowLeft') {
+                    playerX = Math.max(0, playerX - 26);
+                }
+                if (event.key === 'ArrowRight') {
+                    playerX = Math.min(area.clientWidth - 64, playerX + 26);
+                }
+                player.style.left = playerX + 'px';
+            };
+
+            area.addEventListener('keydown', handleMove);
+            area.focus();
+
+            const fallingItems = [];
+            startTimer(25);
+
+            setInterval(() => {
+                if (!gameRunning) return;
+                const item = document.createElement('div');
+                item.className = 'fall';
+                const left = Math.random() * (area.clientWidth - 24);
+                item.style.left = left + 'px';
+                item.style.top = '0px';
+                area.appendChild(item);
+                fallingItems.push(item);
+            }, 850);
+
+            setInterval(() => {
+                if (!gameRunning) return;
+                for (let i = fallingItems.length - 1; i >= 0; i--) {
+                    const item = fallingItems[i];
+                    let top = Number.parseFloat(item.style.top || '0');
+                    top += 8;
+                    item.style.top = top + 'px';
+
+                    const itemLeft = Number.parseFloat(item.style.left || '0');
+                    const playerLeft = Number.parseFloat(player.style.left || '0');
+                    const collision = itemLeft >= playerLeft - 20 && itemLeft <= playerLeft + 70 && top >= area.clientHeight - 40;
+
+                    if (collision) {
+                        endGame(`Kolizja! Wynik: ${score}`);
+                        return;
+                    }
+
+                    if (top > area.clientHeight) {
+                        score += 1;
+                        updateScore();
+                        item.remove();
+                        fallingItems.splice(i, 1);
+                    }
+                }
+            }, 60);
+        }
+
+        stopBtn.addEventListener('click', stopGame);
+        startBtn.addEventListener('click', startGame);
+        resetBtn.addEventListener('click', () => {
+            clearIntervalSafe();
+            gameRunning = false;
+            currentGame = 'clickTarget';
+            renderGamesList();
+            setGameMessage('Zresetowano grę. Wybierz nową i kliknij Start.');
+            score = 0;
+            updateScore();
+            timeLeft = 0;
+            updateTime();
         });
+
+        renderGamesList();
+        selectGame(currentGame);
     </script>
 </body>
 </html>
