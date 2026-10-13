@@ -3,9 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>hakaton</title>
+    <meta name="description" content="Hackathon event page">
+    <title>Hackathon | Deatlon</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #0f172a;
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+
+        main {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            margin: 0 0 0.5rem;
+            font-size: 2.5rem;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #111827;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: #6b7280;
+        }
+    </style>
 </head>
 <body>
-    hakaton dekatlon
+    <header>
+        <h1>Hackathon</h1>
+    </header>
+
+    <main>
+        <section aria-labelledby="event-title">
+            <h2 id="event-title">Hackathon Deatlon</h2>
+            <p>Welcome to our event page. Join us for an exciting challenge, creative problem-solving, and innovation.</p>
+        </section>
+    </main>
+
+    <footer>
+        &copy; 2026 Hackathon
+    </footer>
 </body>
 </html>
