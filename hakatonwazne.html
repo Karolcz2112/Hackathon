@@ -3,24 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>City Bus Rush 2D — Deluxe</title>
+  <title>City Drive 3D</title>
   <style>
     :root {
-      --bg: #06131d;
-      --panel: rgba(12, 24, 34, 0.82);
-      --cyan: #5ee7ff;
-      --text: #edf6ff;
-      --muted: #9db4c4;
-      --shadow: 0 18px 38px rgba(0,0,0,0.38);
+      --bg: #07151f;
+      --panel: rgba(11, 18, 26, 0.8);
+      --line: rgba(255,255,255,0.08);
+      --cyan: #63e8ff;
+      --text: #edf8ff;
+      --muted: #9eb7c8;
+      --gold: #ffd166;
+      --red: #ff5f6d;
     }
 
     * { box-sizing: border-box; }
     html, body {
       margin: 0;
       height: 100%;
-      background:
-        radial-gradient(circle at top, rgba(34, 211, 238, 0.18), transparent 30%),
-        linear-gradient(180deg, #06131d 0%, #111827 100%);
+      background: radial-gradient(circle at top, rgba(99,232,255,0.2), transparent 30%), linear-gradient(180deg, #07151f 0%, #0b1722 100%);
       color: var(--text);
       font-family: Inter, "Segoe UI", sans-serif;
     }
@@ -35,29 +35,21 @@
     }
 
     .topbar {
-      width: min(1280px, calc(100vw - 2rem));
+      width: min(1200px, calc(100vw - 2rem));
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
-      background: rgba(11,18,26,0.72);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 20px;
-      box-shadow: var(--shadow);
-      padding: 0.9rem 1.1rem;
-      backdrop-filter: blur(12px);
-    }
-
-    .brand {
-      display: flex;
-      flex-direction: column;
-      gap: 0.12rem;
+      background: rgba(11,18,26,0.74);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 0.9rem 1rem;
+      box-shadow: 0 18px 38px rgba(0,0,0,0.28);
     }
 
     .brand h1 {
       margin: 0;
-      font-size: clamp(1.1rem, 1.3vw + 0.9rem, 2rem);
-      letter-spacing: 0.6px;
+      font-size: clamp(1.15rem, 1.4vw + 0.9rem, 2rem);
     }
 
     .brand span {
@@ -67,13 +59,13 @@
 
     .hud {
       display: flex;
-      align-items: center;
-      gap: 0.8rem;
       flex-wrap: wrap;
+      gap: 0.7rem;
+      align-items: center;
     }
 
     .stat {
-      min-width: 118px;
+      min-width: 110px;
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.06);
       border-radius: 12px;
@@ -82,77 +74,78 @@
 
     .stat .label {
       display: block;
-      font-size: 0.68rem;
+      font-size: 0.66rem;
       color: var(--muted);
-      letter-spacing: 0.06rem;
+      letter-spacing: 0.08rem;
       text-transform: uppercase;
     }
 
     .stat .value {
       display: block;
       font-weight: 900;
-      font-size: 1.1rem;
       margin-top: 0.2rem;
+      font-size: 1.1rem;
     }
 
-    .game-shell {
-      width: min(1280px, calc(100vw - 2rem));
-      height: min(720px, calc(100vh - 140px));
+    .game-wrap {
+      width: min(1200px, calc(100vw - 2rem));
+      height: min(780px, calc(100vh - 150px));
       position: relative;
+      background: linear-gradient(180deg, rgba(8,18,26,0.95), rgba(10,20,30,0.99));
+      border: 1px solid var(--line);
       border-radius: 22px;
       overflow: hidden;
-      background: linear-gradient(180deg, rgba(10,17,24,0.96), rgba(12,20,30,0.98));
-      border: 1px solid rgba(255,255,255,0.08);
-      box-shadow: var(--shadow);
+      box-shadow: 0 18px 38px rgba(0,0,0,0.32);
     }
 
-    #game-root {
+    canvas {
       width: 100%;
       height: 100%;
+      display: block;
+      background: linear-gradient(180deg, #0a1d2e 0%, #0d2941 45%, #102b3d 100%);
     }
 
-    .mission-box {
+    .message {
       position: absolute;
       left: 1rem;
       bottom: 1rem;
-      background: rgba(7, 18, 29, 0.7);
-      border: 1px solid rgba(94,231,255,0.28);
+      background: rgba(7,18,26,0.7);
+      border: 1px solid rgba(99,232,255,0.35);
       border-radius: 12px;
-      padding: 0.76rem 0.9rem;
-      max-width: 340px;
-      backdrop-filter: blur(8px);
+      padding: 0.75rem 0.9rem;
+      backdrop-filter: blur(6px);
+      max-width: 320px;
       z-index: 10;
       pointer-events: none;
     }
 
-    .mission-box strong {
+    .message strong {
       display: block;
+      color: var(--cyan);
       font-size: 0.7rem;
       text-transform: uppercase;
-      color: var(--cyan);
       letter-spacing: 0.08rem;
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.2rem;
     }
 
-    .mission-box span {
+    .message span {
       color: var(--text);
       font-size: 0.95rem;
       line-height: 1.4;
     }
 
-    .control-button {
+    .button {
       position: absolute;
       right: 1rem;
       bottom: 1rem;
-      z-index: 11;
-      background: linear-gradient(180deg, rgba(94,231,255,0.14), rgba(34,211,238,0.1));
-      border: 1px solid rgba(94,231,255,0.38);
+      z-index: 10;
+      background: linear-gradient(180deg, rgba(99,232,255,0.16), rgba(26,163,198,0.1));
+      border: 1px solid rgba(99,232,255,0.34);
       color: var(--text);
       border-radius: 12px;
       padding: 0.8rem 1rem;
       cursor: pointer;
       font-weight: 800;
-      box-shadow: 0 12px 20px rgba(0,0,0,0.2);
     }
 
     @media (max-width: 760px) {
@@ -164,562 +157,357 @@
         width: 100%;
         justify-content: space-between;
       }
-      .stat {
-        flex: 1 1 28%;
-        min-width: auto;
-      }
-      .game-shell {
-        height: min(640px, calc(100vh - 220px));
-      }
+      .stat { flex: 1 1 27%; min-width: 0; }
+      .game-wrap { height: min(650px, calc(100vh - 210px)); }
     }
   </style>
 </head>
 <body>
   <div class="topbar">
     <div class="brand">
-      <h1>City Bus Rush 2D Deluxe</h1>
-      <span>Autobus po mieście — pasażerowie, paliwo, dzień/noc, ulepszenia i trudniejsze trasy</span>
+      <h1>City Drive 3D</h1>
+      <span>3D arcade driving — wyprzedzaj, zbieraj pieniądze i unikaj kolizji</span>
     </div>
 
     <div class="hud">
-      <div class="stat">
-        <span class="label">Score</span>
-        <span class="value" id="score">0</span>
-      </div>
-      <div class="stat">
-        <span class="label">Cash</span>
-        <span class="value" id="cash">0</span>
-      </div>
-      <div class="stat">
-        <span class="label">Time</span>
-        <span class="value" id="time">120</span>
-      </div>
-      <div class="stat">
-        <span class="label">Passengers</span>
-        <span class="value" id="passengers">0</span>
-      </div>
-      <div class="stat">
-        <span class="label">Fuel</span>
-        <span class="value" id="fuel">100%</span>
-      </div>
-      <div class="stat">
-        <span class="label">Level</span>
-        <span class="value" id="level">1</span>
-      </div>
+      <div class="stat"><span class="label">Score</span><span class="value" id="score">0</span></div>
+      <div class="stat"><span class="label">Cash</span><span class="value" id="cash">0</span></div>
+      <div class="stat"><span class="label">Time</span><span class="value" id="time">90</span></div>
+      <div class="stat"><span class="label">Fuel</span><span class="value" id="fuel">100%</span></div>
+      <div class="stat"><span class="label">Speed</span><span class="value" id="speed">0</span></div>
     </div>
   </div>
 
-  <div class="game-shell">
-    <div id="game-root"></div>
-    <div class="mission-box">
-      <strong>Misja</strong>
-      <span id="missionText">Zbieraj pasażerów, dowoź ich na przystanki i uzupełniaj paliwo.</span>
+  <div class="game-wrap">
+    <canvas id="gameCanvas"></canvas>
+    <div class="message">
+      <strong>Mission</strong>
+      <span id="missionText">Jedź, zbieraj pieniądze i nie rozbij się.</span>
     </div>
-    <button class="control-button" id="restartBtn">Restart</button>
+    <button class="button" id="restartBtn">Restart</button>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
   <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
     const scoreEl = document.getElementById('score');
     const cashEl = document.getElementById('cash');
     const timeEl = document.getElementById('time');
-    const passengerEl = document.getElementById('passengers');
     const fuelEl = document.getElementById('fuel');
-    const levelEl = document.getElementById('level');
+    const speedEl = document.getElementById('speed');
     const missionTextEl = document.getElementById('missionText');
     const restartBtn = document.getElementById('restartBtn');
 
-    class DeluxeBusCityScene extends Phaser.Scene {
-      constructor() {
-        super('DeluxeBusCityScene');
+    let w = 0;
+    let h = 0;
+    let road = { width: 420, half: 210, centerY: 0 };
+    let game = null;
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      const ratio = window.devicePixelRatio || 1;
+      w = Math.max(300, rect.width);
+      h = Math.max(300, rect.height);
+      canvas.width = Math.floor(w * ratio);
+      canvas.height = Math.floor(h * ratio);
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    const keys = {
+      left: false,
+      right: false,
+      up: false,
+      down: false
+    };
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') keys.left = true;
+      if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') keys.right = true;
+      if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') keys.up = true;
+      if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') keys.down = true;
+    });
+
+    window.addEventListener('keyup', (e) => {
+      if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') keys.left = false;
+      if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') keys.right = false;
+      if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') keys.up = false;
+      if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') keys.down = false;
+    });
+
+    function resetGame() {
+      game = {
+        running: true,
+        score: 0,
+        cash: 0,
+        timeLeft: 90,
+        fuel: 100,
+        speed: 0,
+        maxSpeed: 260,
+        roadOffset: 0,
+        playerLane: 0,
+        playerX: 0,
+        obstacles: [],
+        coins: [],
+        lastSpawn: 0,
+        lastCoin: 0,
+        lastTime: 0,
+        shake: 0,
+        mission: 'Jedź, zbieraj pieniądze i nie rozbij się.'
+      };
+    }
+
+    resetGame();
+
+    function spawnObstacle() {
+      const lane = Math.floor(Math.random() * 3) - 1;
+      const z = 1.2;
+      const color = ['#ff7b72', '#fbbf24', '#60a5fa', '#a78bfa', '#34d399'][Math.floor(Math.random() * 5)];
+      game.obstacles.push({ lane, z, color, width: 40, height: 60 });
+    }
+
+    function spawnCoin() {
+      const lane = Math.floor(Math.random() * 3) - 1;
+      game.coins.push({ lane, z: 1.2, r: 14, value: 25 });
+    }
+
+    function updateGame(dt) {
+      if (!game.running) return;
+
+      const accel = keys.up ? 140 : 0;
+      const brake = keys.down ? 220 : 0;
+      const steer = (keys.left ? -1 : 0) + (keys.right ? 1 : 0);
+
+      if (keys.up) game.speed += accel * dt;
+      if (keys.down) game.speed -= brake * dt;
+      if (!keys.up && !keys.down) game.speed *= 0.985;
+
+      game.speed = Math.max(0, Math.min(game.maxSpeed, game.speed));
+      game.playerLane += steer * dt * 2.5;
+      game.playerLane = Math.max(-1.2, Math.min(1.2, game.playerLane));
+      game.playerX = game.playerLane * 170;
+
+      game.roadOffset += game.speed * dt * 0.9;
+      game.timeLeft -= dt;
+      game.fuel = Math.max(0, game.fuel - dt * (game.speed / 70) + (keys.down ? 0.1 : 0));
+
+      if (game.timeLeft <= 0 || game.fuel <= 0) {
+        game.running = false;
+        game.mission = 'Koniec gry — kliknij Restart.';
       }
 
-      create() {
-        this.worldWidth = 2200;
-        this.worldHeight = 1700;
-        this.gameOver = false;
-        this.score = 0;
-        this.cash = 0;
-        this.timeLeft = 120;
-        this.level = 1;
-        this.fuel = 100;
-        this.passengerCount = 0;
-        this.activePassenger = null;
-        this.currentMission = 'Zbieraj pasażerów i dowoź ich na przystanki.';
-        this.dayCycle = 0;
-        this.daySpeed = 0.025;
-        this.busUpgrade = 0;
-        this.updateTimer = 0;
+      if (Math.random() < 0.018 + dt * 0.5) spawnObstacle();
+      if (Math.random() < 0.012 + dt * 0.3) spawnCoin();
 
-        this.cameras.main.setBackgroundColor('#102330');
-        this.cameras.main.setBounds(0, 0, this.worldWidth, this.worldHeight);
-
-        this.createCity();
-        this.createPlayer();
-        this.createStops();
-        this.createFuelStations();
-        this.createTraffic();
-        this.createDecor();
-        this.createInput();
-        this.createStars();
-        this.updateHud();
-
-        this.time.addEvent({
-          delay: 1000,
-          loop: true,
-          callback: () => {
-            if (this.gameOver) return;
-            this.timeLeft -= 1;
-            if (this.timeLeft <= 0) {
-              this.endGame();
-              return;
-            }
-            this.fuel = Phaser.Math.Clamp(this.fuel - (Math.abs(this.player.speed) > 80 ? 1.8 : 0.8), 0, 100);
-            if (this.fuel <= 0) {
-              this.endGame();
-              return;
-            }
-            this.updateHud();
-          }
-        });
-      }
-
-      createCity() {
-        this.roadRects = [];
-        const g = this.add.graphics();
-        g.fillStyle(0x143245, 1);
-        g.fillRect(0, 0, this.worldWidth, this.worldHeight);
-
-        const roads = [
-          { x: 180, y: 110, w: 1770, h: 120 },
-          { x: 180, y: 340, w: 1770, h: 120 },
-          { x: 180, y: 600, w: 1770, h: 120 },
-          { x: 180, y: 880, w: 1770, h: 120 },
-          { x: 180, y: 1160, w: 1770, h: 120 },
-          { x: 300, y: 80, w: 110, h: 1460 },
-          { x: 760, y: 80, w: 110, h: 1460 },
-          { x: 1200, y: 80, w: 110, h: 1460 },
-          { x: 1640, y: 80, w: 110, h: 1460 },
-          { x: 1930, y: 80, w: 110, h: 1460 }
-        ];
-
-        roads.forEach((road) => {
-          g.fillStyle(0x2a3542, 1);
-          g.fillRoundedRect(road.x, road.y, road.w, road.h, 18);
-          this.roadRects.push(new Phaser.Geom.Rectangle(road.x, road.y, road.w, road.h));
-
-          g.lineStyle(3, 0xf5f5f5, 0.18);
-          if (road.w > road.h) {
-            for (let x = road.x + 60; x < road.x + road.w; x += 120) {
-              g.fillStyle(0xfafcff, 0.23);
-              g.fillRect(x, road.y + road.h / 2 - 4, 42, 8);
-            }
-          } else {
-            for (let y = road.y + 60; y < road.y + road.h; y += 120) {
-              g.fillStyle(0xfafcff, 0.23);
-              g.fillRect(road.x + road.w / 2 - 4, y, 8, 42);
-            }
-          }
-        });
-
-        const buildingBlocks = [
-          { x: 0, y: 0, w: 2200, h: 80 },
-          { x: 0, y: 230, w: 170, h: 110 },
-          { x: 0, y: 460, w: 170, h: 140 },
-          { x: 0, y: 720, w: 170, h: 160 },
-          { x: 0, y: 1000, w: 170, h: 160 },
-          { x: 0, y: 1280, w: 170, h: 420 },
-          { x: 1970, y: 230, w: 230, h: 110 },
-          { x: 1970, y: 460, w: 230, h: 140 },
-          { x: 1970, y: 720, w: 230, h: 160 },
-          { x: 1970, y: 1000, w: 230, h: 160 },
-          { x: 1970, y: 1280, w: 230, h: 420 }
-        ];
-
-        buildingBlocks.forEach((b) => {
-          const color = Phaser.Display.Color.GetColor(
-            35 + Math.random() * 25,
-            52 + Math.random() * 25,
-            62 + Math.random() * 24
-          );
-          g.fillStyle(color, 1);
-          g.fillRoundedRect(b.x, b.y, b.w, b.h, 12);
-          g.fillStyle(0x0a0f16, 0.36);
-          g.fillRect(b.x + 18, b.y + 18, b.w - 36, b.h - 36);
-        });
-      }
-
-      createPlayer() {
-        const g = this.make.graphics({ add: false });
-        g.fillStyle(0x2bd7ff, 1);
-        g.fillRoundedRect(0, 0, 120, 60, 16);
-        g.fillStyle(0xeafcff, 0.9);
-        for (let i = 0; i < 4; i++) {
-          g.fillRoundedRect(16 + i * 26, 10, 16, 16, 4);
+      for (let i = game.obstacles.length - 1; i >= 0; i--) {
+        const o = game.obstacles[i];
+        o.z += (0.6 + game.speed / 180) * dt;
+        if (o.z > 1.8) {
+          game.obstacles.splice(i, 1);
+          game.score += 10;
         }
-        g.fillStyle(0x0d1320, 1);
-        g.fillRoundedRect(10, 18, 12, 12, 3);
-        g.fillRoundedRect(98, 18, 12, 12, 3);
-        g.fillRoundedRect(10, 30, 12, 12, 3);
-        g.fillRoundedRect(98, 30, 12, 12, 3);
-        g.generateTexture('busBody', 120, 60);
-        g.destroy();
 
-        this.player = this.physics.add.sprite(260, 220, 'busBody');
-        this.player.setCollideWorldBounds(true);
-        this.player.setDepth(30);
-        this.player.setDrag(160);
-        this.player.body.setSize(110, 44);
-        this.player.angle = 90;
-        this.player.speed = 0;
-        this.player.maxSpeed = 300 + this.busUpgrade * 25;
-
-        this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
-      }
-
-      createStops() {
-        this.stops = [
-          { id: 'stationA', name: 'Dworzec', x: 260, y: 220, waiting: true, passenger: false },
-          { id: 'stationB', name: 'Rondo', x: 980, y: 220, waiting: true, passenger: false },
-          { id: 'stationC', name: 'Park', x: 700, y: 900, waiting: true, passenger: false },
-          { id: 'stationD', name: 'Centrum', x: 1580, y: 1040, waiting: true, passenger: false },
-          { id: 'stationE', name: 'Port', x: 1980, y: 480, waiting: true, passenger: false },
-          { id: 'stationF', name: 'Muzeum', x: 1480, y: 1320, waiting: true, passenger: false },
-          { id: 'stationG', name: 'Lotnisko', x: 360, y: 1420, waiting: true, passenger: false },
-          { id: 'stationH', name: 'Bulwar', x: 1100, y: 1480, waiting: true, passenger: false }
-        ];
-
-        this.stopSprites = [];
-        this.stops.forEach((s) => {
-          const ring = this.add.circle(s.x, s.y, 22, 0x5ee7ff, 0.22);
-          const dot = this.add.circle(s.x, s.y, 10, 0x5ee7ff, 1);
-          const label = this.add.text(s.x, s.y + 38, s.name, {
-            font: 'bold 12px Inter, Segoe UI, sans-serif',
-            color: '#dff7ff',
-            backgroundColor: 'rgba(3, 9, 15, 0.5)',
-            padding: { x: 6, y: 2 }
-          }).setOrigin(0.5);
-          this.stopSprites.push({ ring, dot, label, ...s });
-        });
-      }
-
-      createFuelStations() {
-        this.fuelStations = [
-          { x: 420, y: 220 },
-          { x: 1360, y: 500 },
-          { x: 1120, y: 1260 },
-          { x: 420, y: 940 }
-        ];
-
-        this.fuelSprites = [];
-        this.fuelStations.forEach((station) => {
-          const g = this.add.graphics();
-          g.fillStyle(0x22c55e, 1);
-          g.fillRoundedRect(-18, -12, 36, 24, 8);
-          g.fillStyle(0xffffff, 0.85);
-          g.fillRect(-6, -8, 12, 16);
-          const sprite = this.add.container(station.x, station.y);
-          sprite.add(g);
-          this.fuelSprites.push({ container: sprite, x: station.x, y: station.y });
-        });
-      }
-
-      createTraffic() {
-        this.trafficCars = [];
-        const laneConfigs = [
-          { x: 500, y: 170, dir: 1, color: 0xffb703 },
-          { x: 930, y: 170, dir: 1, color: 0xff7d50 },
-          { x: 1380, y: 170, dir: 1, color: 0x7dd3fc },
-          { x: 1700, y: 480, dir: -1, color: 0x8b5cf6 },
-          { x: 1110, y: 860, dir: 1, color: 0x34d399 },
-          { x: 1600, y: 860, dir: 1, color: 0x38bdf8 },
-          { x: 840, y: 1210, dir: -1, color: 0xf97316 },
-          { x: 1300, y: 1210, dir: -1, color: 0xfbbf24 },
-          { x: 1700, y: 1380, dir: -1, color: 0xf472b6 },
-          { x: 560, y: 1380, dir: 1, color: 0x60a5fa }
-        ];
-
-        const g = this.make.graphics({ add: false });
-        g.fillStyle(0x111827, 1);
-        g.fillRoundedRect(0, 0, 48, 26, 8);
-        g.fillStyle(0xffffff, 1);
-        g.fillRoundedRect(14, 6, 18, 8, 2);
-        g.generateTexture('trafficCar', 48, 26);
-        g.destroy();
-
-        laneConfigs.forEach((cfg, i) => {
-          const car = this.physics.add.sprite(cfg.x, cfg.y, 'trafficCar');
-          car.setTint(cfg.color);
-          car.setDepth(12);
-          car.setImmovable(true);
-          car.body.setAllowGravity(false);
-          car.direction = cfg.dir;
-          car.speed = 70 + i * 13 + this.level * 6;
-          car.setSize(44, 20);
-          this.trafficCars.push(car);
-        });
-      }
-
-      createDecor() {
-        const treeG = this.make.graphics({ add: false });
-        treeG.fillStyle(0x12a66d, 1);
-        treeG.fillCircle(0, 0, 18);
-        treeG.generateTexture('tree', 36, 36);
-        treeG.destroy();
-
-        for (let i = 0; i < 45; i++) {
-          const x = 180 + Math.random() * (this.worldWidth - 360);
-          const y = 180 + Math.random() * (this.worldHeight - 360);
-          if (this.roadRects.some(r => Phaser.Geom.Rectangle.Contains(r, x, y))) continue;
-          this.add.image(x, y, 'tree').setScale(0.7 + Math.random() * 0.7).setDepth(4);
+        if (o.z > 1.1 && o.z < 1.4) {
+          const close = Math.abs(o.lane - game.playerLane) < 0.55;
+          if (close) {
+            game.running = false;
+            game.mission = 'Kolizja! Wystarczy restart.';
+            game.shake = 0.6;
+          }
         }
       }
 
-      createStars() {
-        this.stars = this.add.group();
-        for (let i = 0; i < 65; i++) {
-          const star = this.add.circle(80 + Math.random() * (this.worldWidth - 160), 80 + Math.random() * (this.worldHeight - 160), 2 + Math.random() * 2, 0xffffff, 0.9);
-          star.alpha = 0.25 + Math.random() * 0.75;
-          this.stars.add(star);
+      for (let i = game.coins.length - 1; i >= 0; i--) {
+        const coin = game.coins[i];
+        coin.z += (0.7 + game.speed / 200) * dt;
+        if (coin.z > 1.8) {
+          game.coins.splice(i, 1);
+          continue;
+        }
+
+        if (coin.z > 1.08 && coin.z < 1.42 && Math.abs(coin.lane - game.playerLane) < 0.45) {
+          game.cash += coin.value;
+          game.score += 60;
+          game.coins.splice(i, 1);
+          game.mission = 'Dobrze! Złapana nagroda.';
         }
       }
 
-      createInput() {
-        this.cursorKeys = this.input.keyboard.createCursorKeys();
-        this.keys = this.input.keyboard.addKeys({
-          W: Phaser.Input.Keyboard.KeyCodes.W,
-          A: Phaser.Input.Keyboard.KeyCodes.A,
-          S: Phaser.Input.Keyboard.KeyCodes.S,
-          D: Phaser.Input.Keyboard.KeyCodes.D,
-          E: Phaser.Input.Keyboard.KeyCodes.E,
-          SHIFT: Phaser.Input.Keyboard.KeyCodes.SHIFT
-        });
+      if (game.score > 0 && game.score % 900 < 20 && game.cash > 0 && game.running) {
+        game.maxSpeed = Math.min(340, game.maxSpeed + 0.02);
       }
 
-      updateHud() {
-        scoreEl.textContent = this.score;
-        cashEl.textContent = this.cash;
-        timeEl.textContent = Math.max(0, this.timeLeft);
-        passengerEl.textContent = this.passengerCount;
-        fuelEl.textContent = `${Math.round(this.fuel)}%`;
-        levelEl.textContent = this.level;
-        missionTextEl.textContent = this.currentMission;
-      }
+      game.shake = Math.max(0, game.shake - dt * 1.4);
+      updateHud();
+    }
 
-      getNearestStop() {
-        let best = null;
-        let bestDist = Infinity;
-        this.stopSprites.forEach((stop) => {
-          const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, stop.x, stop.y);
-          if (d < bestDist && d < 90) {
-            bestDist = d;
-            best = stop;
-          }
-        });
-        return best;
-      }
+    function updateHud() {
+      scoreEl.textContent = Math.floor(game.score);
+      cashEl.textContent = Math.floor(game.cash);
+      timeEl.textContent = Math.max(0, Math.ceil(game.timeLeft));
+      fuelEl.textContent = `${Math.ceil(game.fuel)}%`;
+      speedEl.textContent = `${Math.floor(game.speed)} km/h`;
+      missionTextEl.textContent = game.mission;
+    }
 
-      getNearestFuelStation() {
-        let best = null;
-        let bestDist = Infinity;
-        this.fuelSprites.forEach((s) => {
-          const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, s.x, s.y);
-          if (d < bestDist && d < 90) {
-            bestDist = d;
-            best = s;
-          }
-        });
-        return best;
-      }
+    function drawBackground() {
+      const sky = ctx.createLinearGradient(0, 0, 0, h * 0.7);
+      sky.addColorStop(0, '#0b1b2c');
+      sky.addColorStop(0.5, '#18314d');
+      sky.addColorStop(1, '#1a3550');
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, w, h);
 
-      assignMission() {
-        const available = this.stops.filter(s => s.waiting && s.id !== this.activePassenger?.from);
-        if (!available.length) return;
-        const from = Phaser.Utils.Array.GetRandom(this.stops.filter(s => s.waiting));
-        const targets = this.stops.filter(s => s.id !== from.id);
-        const to = Phaser.Utils.Array.GetRandom(targets);
-        from.waiting = false;
-        this.activePassenger = { from: from.id, to: to.id, multiplier: 1 + Math.floor(Math.random() * 3), destinationName: to.name };
-        this.passengerCount += 1;
-        this.currentMission = `Pasażer: ${from.name} → ${to.name}`;
-        this.updateHud();
-      }
+      const sunX = w * 0.82;
+      const sunY = h * 0.18;
+      const sun = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, 80);
+      sun.addColorStop(0, 'rgba(255, 219, 110, 0.95)');
+      sun.addColorStop(1, 'rgba(255, 219, 110, 0)');
+      ctx.fillStyle = sun;
+      ctx.fillRect(sunX - 120, sunY - 120, 240, 240);
 
-      takePassenger() {
-        const stop = this.getNearestStop();
-        if (!stop) return;
-        if (this.activePassenger) {
-          if (stop.id === this.activePassenger.to) {
-            const reward = 100 + this.activePassenger.multiplier * 60;
-            this.cash += reward;
-            this.score += reward;
-            this.passengerCount = Math.max(0, this.passengerCount - 1);
-            this.activePassenger = null;
-            this.currentMission = 'Pasażer dowieziony! Szukaj kolejnego.';
-            this.updateHud();
-            if (this.score >= this.level * 900) {
-              this.level += 1;
-              this.timeLeft += 25;
-              this.currentMission = `Poziom ${this.level}! Ruch uliczny przyspiesza.`;
-              this.updateHud();
-            }
-          }
-          return;
-        }
-
-        if (stop.waiting) {
-          const targets = this.stops.filter(s => s.id !== stop.id);
-          const target = Phaser.Utils.Array.GetRandom(targets);
-          stop.waiting = false;
-          this.activePassenger = { from: stop.id, to: target.id, multiplier: 1 + Math.floor(Math.random() * 3), destinationName: target.name };
-          this.passengerCount += 1;
-          this.currentMission = `Pasażer: ${stop.name} → ${target.name}`;
-          this.updateHud();
-        }
-      }
-
-      refillFuel() {
-        const station = this.getNearestFuelStation();
-        if (!station) return;
-        this.fuel = 100;
-        this.cash = Math.max(0, this.cash - 25);
-        this.currentMission = 'Paliwo uzupełnione — jedź dalej.';
-        this.updateHud();
-      }
-
-      endGame() {
-        this.gameOver = true;
-        this.currentMission = 'Koniec gry! Kliknij Restart, aby zacząć od nowa.';
-        this.updateHud();
-        this.cameras.main.shake(250, 0.02);
-      }
-
-      updateDayNight(delta) {
-        this.dayCycle += this.daySpeed * (delta / 16.67);
-        const dayPhase = (Math.sin(this.dayCycle) + 1) / 2;
-        const r = Math.floor(7 + dayPhase * 30);
-        const g = Math.floor(18 + dayPhase * 40);
-        const b = Math.floor(30 + dayPhase * 45);
-        this.cameras.main.setBackgroundColor(`rgb(${r}, ${g}, ${b})`);
-
-        this.stars.forEach((star) => {
-          star.alpha = 0.15 + (1 - dayPhase) * 0.9;
-        });
-      }
-
-      update(time, delta) {
-        if (this.gameOver) return;
-
-        this.updateDayNight(delta);
-
-        const dt = delta / 1000;
-        const left = this.cursorKeys.left.isDown || this.keys.A.isDown;
-        const right = this.cursorKeys.right.isDown || this.keys.D.isDown;
-        const accelerate = this.cursorKeys.up.isDown || this.keys.W.isDown;
-        const brake = this.cursorKeys.down.isDown || this.keys.S.isDown;
-        const boost = this.keys.SHIFT.isDown;
-
-        const pickup = Phaser.Input.Keyboard.JustDown(this.keys.E);
-        if (pickup) {
-          const nearestStop = this.getNearestStop();
-          if (nearestStop) {
-            this.takePassenger();
-          }
-          const nearestFuel = this.getNearestFuelStation();
-          if (nearestFuel && !nearestStop) {
-            this.refillFuel();
-          }
-        }
-
-        const maxSpeed = 320 + this.busUpgrade * 25 + (boost ? 80 : 0);
-        if (accelerate) this.player.speed += 230 * dt;
-        if (brake) this.player.speed -= 260 * dt;
-        if (!accelerate && !brake) this.player.speed *= 0.985;
-
-        const turnPower = Phaser.Math.Clamp(Math.abs(this.player.speed) / maxSpeed, 0.2, 1);
-        if (left) this.player.rotation -= 1.7 * dt * turnPower;
-        if (right) this.player.rotation += 1.7 * dt * turnPower;
-
-        this.player.speed = Phaser.Math.Clamp(this.player.speed, -80, maxSpeed);
-
-        const isOnRoad = this.roadRects.some(r => Phaser.Geom.Rectangle.Contains(r, this.player.x, this.player.y));
-        if (!isOnRoad) {
-          this.player.speed *= 0.94;
-          if (this.player.speed < 0.6) this.player.speed = 0;
-        }
-
-        this.player.x += Math.cos(this.player.rotation) * this.player.speed * dt;
-        this.player.y += Math.sin(this.player.rotation) * this.player.speed * dt;
-
-        this.player.x = Phaser.Math.Clamp(this.player.x, 70, this.worldWidth - 70);
-        this.player.y = Phaser.Math.Clamp(this.player.y, 70, this.worldHeight - 70);
-
-        this.stopSprites.forEach((stop) => {
-          const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, stop.x, stop.y);
-          if (d < 36) {
-            stop.ring.setFillStyle(0x5ee7ff, 0.45);
-            stop.dot.setScale(1.12);
-          } else {
-            stop.ring.setFillStyle(0x5ee7ff, 0.2);
-            stop.dot.setScale(1);
-          }
-        });
-
-        this.trafficCars.forEach((car) => {
-          car.x += car.direction * car.speed * dt;
-          if (car.x < 90 || car.x > this.worldWidth - 90) {
-            car.direction *= -1;
-          }
-          const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, car.x, car.y);
-          if (d < 52) {
-            this.player.speed *= 0.58;
-            this.fuel = Phaser.Math.Clamp(this.fuel - 9, 0, 100);
-            this.cash = Math.max(0, this.cash - 10);
-            this.score = Math.max(0, this.score - 30);
-            this.cameras.main.shake(80, 0.012);
-          }
-        });
-
-        if (Math.abs(this.player.speed) > 90) {
-          this.fuel = Phaser.Math.Clamp(this.fuel - dt * 7, 0, 100);
-        }
-
-        if (this.activePassenger) {
-          const targetStop = this.stops.find(s => s.id === this.activePassenger.to);
-          if (targetStop) {
-            const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, targetStop.x, targetStop.y);
-            if (d < 45) {
-              this.takePassenger();
-            }
-          }
-        }
-
-        if (this.fuel <= 0) {
-          this.endGame();
-        }
-
-        this.updateHud();
+      for (let i = 0; i < 30; i++) {
+        const x = ((i * 170) % (w + 120)) - 60;
+        const y = 80 + ((i * 90) % 220);
+        const hgt = 30 + ((i * 31) % 80);
+        ctx.fillStyle = 'rgba(16, 24, 31, 0.9)';
+        ctx.fillRect(x, y, 42, hgt);
+        ctx.fillStyle = 'rgba(99,232,255,0.08)';
+        ctx.fillRect(x + 8, y + 8, 12, hgt - 16);
       }
     }
 
-    const config = {
-      type: Phaser.AUTO,
-      width: 1280,
-      height: 720,
-      parent: 'game-root',
-      backgroundColor: '#06131d',
-      scene: [DeluxeBusCityScene],
-      physics: {
-        default: 'arcade',
-        arcade: { debug: false, gravity: { y: 0 } }
-      },
-      render: { antialias: true, pixelArt: false }
-    };
+    function drawRoad() {
+      const horizon = h * 0.26;
+      const roadTopWidth = w * 0.18;
+      const roadBottomWidth = w * 0.85;
+      const roadY = h * 0.18;
 
-    const game = new Phaser.Game(config);
+      ctx.fillStyle = '#1a202a';
+      ctx.beginPath();
+      ctx.moveTo(w / 2 - roadTopWidth / 2, roadY);
+      ctx.lineTo(w / 2 + roadTopWidth / 2, roadY);
+      ctx.lineTo(w / 2 + roadBottomWidth / 2, h);
+      ctx.lineTo(w / 2 - roadBottomWidth / 2, h);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(w / 2 - roadTopWidth / 2, roadY);
+      ctx.lineTo(w / 2 - roadBottomWidth / 2, h);
+      ctx.moveTo(w / 2 + roadTopWidth / 2, roadY);
+      ctx.lineTo(w / 2 + roadBottomWidth / 2, h);
+      ctx.stroke();
+
+      for (let i = 0; i < 14; i++) {
+        const t = i / 14;
+        const y = roadY + (h - roadY) * t;
+        const x1 = w / 2 - (roadTopWidth / 2 + (roadBottomWidth - roadTopWidth) * t) * 0.5;
+        const x2 = w / 2 + (roadTopWidth / 2 + (roadBottomWidth - roadTopWidth) * t) * 0.5;
+        ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(x1 + (x2 - x1) * 0.25, y);
+        ctx.lineTo(x1 + (x2 - x1) * 0.25, y + 20);
+        ctx.moveTo(x2 - (x2 - x1) * 0.25, y);
+        ctx.lineTo(x2 - (x2 - x1) * 0.25, y + 20);
+        ctx.stroke();
+      }
+    }
+
+    function drawObstacles() {
+      for (const o of game.obstacles) {
+        const z = Math.min(1.8, o.z);
+        const scale = 1 / (0.3 + z * 1.4);
+        const x = w / 2 + o.lane * 170 * scale;
+        const y = 120 + (z - 0.2) * 260 + (1 / z) * 120;
+        const wv = 32 * scale;
+        const hv = 58 * scale;
+
+        ctx.fillStyle = o.color;
+        ctx.fillRect(x - wv / 2, y - hv / 2, wv, hv);
+        ctx.fillStyle = 'rgba(0,0,0,0.32)';
+        ctx.fillRect(x - (wv * 0.6) / 2, y - hv * 0.15, wv * 0.6, hv * 0.5);
+      }
+    }
+
+    function drawCoins() {
+      for (const c of game.coins) {
+        const z = Math.min(1.8, c.z);
+        const scale = 1 / (0.4 + z * 1.5);
+        const x = w / 2 + c.lane * 170 * scale;
+        const y = 100 + (z - 0.2) * 260 + (1 / z) * 110;
+        const r = c.r * scale;
+
+        ctx.beginPath();
+        ctx.fillStyle = '#ffd166';
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.strokeStyle = '#fff3bf';
+        ctx.lineWidth = 2;
+        ctx.arc(x, y, r * 0.6, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+
+    function drawPlayer() {
+      const x = w / 2 + game.playerX;
+      const y = h - 120;
+      const bodyW = 60;
+      const bodyH = 90;
+
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.fillStyle = '#63e8ff';
+      ctx.fillRect(-bodyW / 2, -bodyH / 2, bodyW, bodyH);
+      ctx.fillStyle = '#eafcff';
+      ctx.fillRect(-20, -28, 16, 18);
+      ctx.fillRect(4, -28, 16, 18);
+      ctx.fillStyle = '#0b1622';
+      ctx.fillRect(-18, -8, 12, 12);
+      ctx.fillRect(6, -8, 12, 12);
+      ctx.fillRect(-18, 22, 12, 12);
+      ctx.fillRect(6, 22, 12, 12);
+      ctx.restore();
+    }
+
+    function draw() {
+      const shakeX = game.shake > 0 ? (Math.random() - 0.5) * 10 * game.shake : 0;
+      const shakeY = game.shake > 0 ? (Math.random() - 0.5) * 10 * game.shake : 0;
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.save();
+      ctx.translate(shakeX, shakeY);
+
+      drawBackground();
+      drawRoad();
+      drawCoins();
+      drawObstacles();
+      drawPlayer();
+
+      ctx.restore();
+    }
+
+    let last = performance.now();
+    function tick(now) {
+      const dt = Math.min((now - last) / 1000, 0.033);
+      last = now;
+      updateGame(dt);
+      draw();
+      requestAnimationFrame(tick);
+    }
+
     restartBtn.addEventListener('click', () => {
-      window.location.reload();
+      resetGame();
     });
+
+    requestAnimationFrame(tick);
   </script>
 </body>
 </html>
