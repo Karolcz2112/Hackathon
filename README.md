@@ -43,16 +43,6 @@ Gra zręcznościowa inspirowana Timbermanem. Wspinaj się po makietowej wieży, 
 - **B** — sklep; **←/→** przeglądanie, **Enter/Spacja/B** zakup lub wybór, **Esc** powrót.
 - W menu gry **A/D** lub strzałkami wybieraj tryb.
 
-## Tworzenie pliku `.exe` dla Windows
-
-1. Otwórz projekt w Godot.
-2. Zainstaluj szablony eksportu: **Editor → Manage Export Templates**.
-3. Wybierz **Project → Export… → Add… → Windows Desktop**.
-4. Wskaż preset Windows Desktop i wybierz ścieżkę, np. `build/MenuGier.exe`.
-5. Kliknij **Export Project**.
-6. Jeśli obok pliku `.exe` powstanie plik `.pck`, zostaw oba pliki razem. Do udostępnienia spakuj wszystkie pliki utworzone przez eksport.
-
-Oficjalna instrukcja: [eksport projektu Godot na Windows](https://docs.godotengine.org/en/stable/tutorials/export/exporting_for_windows.html).
 ## Film
 
 Aby otworzyć prezentację, umieść plik ilm.mp4 w tym samym folderze co ten README, a następnie kliknij: [Odtwórz film](film.mp4).
