@@ -326,7 +326,8 @@ func draw_player(x: float, y: float) -> void:
 	var blade_p2: Vector2 = active_hand + dir_vec * 8.0 - perp * 6.0
 	var blade_p3: Vector2 = active_hand + dir_vec * 18.0
 	var blade_points: PackedVector2Array = PackedVector2Array([blade_p1, blade_p2, blade_p3])
-	draw_polygon(blade_points, Color("#bdc3c7"))
+	var blade_colors: PackedColorArray = PackedColorArray([Color("#bdc3c7"), Color("#bdc3c7"), Color("#bdc3c7")])
+	draw_polygon(blade_points, blade_colors)
 
 	# small detail: axe edge
 	var edge_p1: Vector2 = active_hand + dir_vec * 18.0
