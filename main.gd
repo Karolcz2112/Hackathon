@@ -246,7 +246,7 @@ func draw_arm(cy: float, dir: float, idx: int) -> void:
 	var ang := 0.0
 	if idx >= 0 and idx < seg_angles.size():
 		ang = seg_angles[idx]
-	var local := Vector2(ARM_LEN, 0).rotated(ang * dir)
+	var local: Vector2 = Vector2(ARM_LEN, 0).rotated(ang * dir)
 	var tip := Vector2(base_x, cy) + Vector2(local.x * dir, local.y)
 	draw_line(Vector2(base_x, cy), tip, Color("#c0392b"), 8.0)
 	draw_line(Vector2(base_x, cy - 20.0), tip - Vector2(0, 20.0), Color("#c0392b"), 4.0)
@@ -255,7 +255,7 @@ func draw_arm(cy: float, dir: float, idx: int) -> void:
 	draw_circle(tip + Vector2(0, 14.0), 6.0, Color(1, 0.2, 0.2, blink))
 	for k in range(3):
 		var frac := float(k + 1) / 4.0
-		var p := Vector2(base_x, cy).linear_interpolate(tip, frac)
+		var p: Vector2 = Vector2(base_x, cy).linear_interpolate(tip, frac)
 		draw_rect(Rect2(p.x - 3, p.y - 2, 6, 4), Color("#bdc3c7"))
 
 
