@@ -1,6 +1,6 @@
 extends Node2D
 
-## Kosmiczny kurier: kompletny prototyp w jednej scenie, bez zewnętrznych assetów.
+## Kosmiczny kurier: bardziej retro, z antenami i większym marginesem od gracza.
 const PLAYER_Y_RATIO := 0.82
 const PLAYER_SPEED := 520.0
 const MAX_LIVES := 3
@@ -46,7 +46,7 @@ func _reset_stars() -> void:
 	for i in count:
 		stars.append({
 			"pos": Vector2(rng.randf_range(0.0, screen_size.x), rng.randf_range(0.0, screen_size.y)),
-			"size": rng.randf_range(1.0, 2.6),
+			"size": rng.randf_range(1.0, 2.8),
 			"alpha": rng.randf_range(0.25, 0.9),
 			"speed": rng.randf_range(18.0, 65.0)
 		})
@@ -117,7 +117,9 @@ func _process(delta: float) -> void:
 			player_x += direction * PLAYER_SPEED * dt
 		player_x = clampf(player_x, 24.0, screen_size.x - 24.0)
 		spawn_timer += dt
-		var interval := maxf(0.28, 0.78 - score * 0.0007)
+		var interval := maxf(0.42, 0.92 - score * 0.0045)
+		if score >= 100:
+			interval = maxf(0.48, interval + (score - 100.0) * 0.0022)
 		if spawn_timer >= interval:
 			spawn_timer = 0.0
 			_spawn_item()
@@ -125,24 +127,34 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 func _spawn_item() -> void:
-	var is_asteroid := rng.randf() < 0.64
+	var is_asteroid := rng.randf() < 0.62
+	var x := rng.randf_range(28.0, screen_size.x - 28.0)
+	var tries := 0
+	while absf(x - player_x) < 160.0 and tries < 18:
+		x = rng.randf_range(28.0, screen_size.x - 28.0)
+		tries += 1
 	items.append({
-		"x": rng.randf_range(28.0, screen_size.x - 28.0),
-		"y": -32.0,
-		"radius": rng.randf_range(13.0, 23.0) if is_asteroid else 15.0,
+		"x": x,
+		"y": -48.0,
+		"radius": rng.randf_range(15.0, 22.0) if is_asteroid else 14.0,
 		"asteroid": is_asteroid,
 		"rotation": rng.randf_range(0.0, TAU),
-		"spin": rng.randf_range(-1.5, 1.5)
+		"spin": rng.randf_range(-1.8, 1.8),
+		"height": rng.randf_range(36.0, 78.0),
+		"phase": rng.randf_range(0.0, TAU),
+		"can_be_cleared": not is_asteroid
 	})
 
 func _update_items(delta: float) -> void:
-	var fall_speed := 250.0 + minf(score * 0.22, 330.0)
+	var fall_speed := 210.0 + minf(score * 0.18, 190.0)
+	if score >= 100:
+		fall_speed = 210.0 + minf(100.0 * 0.18, 190.0) + (score - 100.0) * 0.08
 	for i in range(items.size() - 1, -1, -1):
 		var item := items[i]
 		item["y"] = float(item["y"]) + fall_speed * (1.0 if item["asteroid"] else 0.82) * delta
 		item["rotation"] = float(item["rotation"]) + float(item["spin"]) * delta
 		var player_pos := Vector2(player_x, screen_size.y * PLAYER_Y_RATIO)
-		if player_pos.distance_to(Vector2(float(item["x"]), float(item["y"]))) < float(item["radius"]) + 13.0:
+		if player_pos.distance_to(Vector2(float(item["x"]), float(item["y"]))) < float(item["radius"]) + 15.0:
 			if item["asteroid"]:
 				lives -= 1
 				if lives <= 0:
@@ -152,13 +164,13 @@ func _update_items(delta: float) -> void:
 			else:
 				score += 10
 			items.remove_at(i)
-		elif float(item["y"]) > screen_size.y + 40.0:
+		elif float(item["y"]) > screen_size.y + 80.0:
 			items.remove_at(i)
 
 func _draw() -> void:
 	var bg := Color("090e24")
 	draw_rect(Rect2(Vector2.ZERO, screen_size), bg)
-	draw_circle(screen_size * Vector2(0.5, 0.44), screen_size.y * 0.62, Color(0.12, 0.14, 0.34, 0.22))
+	draw_circle(screen_size * Vector2(0.5, 0.42), screen_size.y * 0.62, Color(0.12, 0.14, 0.34, 0.24))
 	for star in stars:
 		var p: Vector2 = star["pos"]
 		draw_circle(p, float(star["size"]), Color(0.82, 0.89, 1.0, float(star["alpha"])))
@@ -180,32 +192,54 @@ func _draw_hud() -> void:
 	_draw_text(hearts, Vector2(screen_size.x - 115, 68), 22, Color("ff81c8"))
 
 func _draw_menu() -> void:
-	draw_rect(Rect2(Vector2.ZERO, screen_size), Color(0.025, 0.035, 0.09, 0.48))
+	draw_rect(Rect2(Vector2.ZERO, screen_size), Color(0.025, 0.035, 0.09, 0.52))
 	var center_x := screen_size.x * 0.5
-	_draw_text("✦  MISJA SPECJALNA  ✦", Vector2(center_x - 135, screen_size.y * 0.34), 15, Color("7cf5ff"))
-	_draw_text("KOSMICZNY KURIER", Vector2(center_x - 244, screen_size.y * 0.44), 38, Color("eff5ff"))
-	_draw_text("Zbieraj paczki ✦   Omijaj asteroidy", Vector2(center_x - 177, screen_size.y * 0.52), 17, Color("bac5e2"))
-	_draw_text("← → / A D albo przeciągaj myszą lub palcem", Vector2(center_x - 215, screen_size.y * 0.58), 14, Color("9da9cc"))
+	_draw_text("✦  MISJA ANTENOWA  ✦", Vector2(center_x - 154, screen_size.y * 0.34), 15, Color("7cf5ff"))
+	_draw_text("EIFFEL  SIGNAL", Vector2(center_x - 180, screen_size.y * 0.44), 38, Color("eff5ff"))
+	_draw_text("Zbieraj sygnały ✦   omijaj wieże", Vector2(center_x - 178, screen_size.y * 0.52), 17, Color("bac5e2"))
+	_draw_text("← → / A D albo przeciągaj myszą lub palcem", Vector2(center_x - 214, screen_size.y * 0.58), 14, Color("9da9cc"))
 	_draw_text("KLIKNIJ LUB NACIŚNIJ SPACJĘ, ABY ZAGRAĆ", Vector2(center_x - 224, screen_size.y * 0.69), 16, Color("ffe78a"))
 
 func _draw_item(item: Dictionary) -> void:
 	var pos := Vector2(float(item["x"]), float(item["y"]))
-	var radius := float(item["radius"])
+	var swing := sin(elapsed * 3.8 + float(item["phase"])) * 5.0
 	if item["asteroid"]:
-		draw_circle(pos, radius, Color("77749c"))
-		draw_arc(pos, radius, 0.0, TAU, 24, Color("b1a8d1"), 2.0)
-		draw_circle(pos + Vector2(-radius * 0.28, 0), radius * 0.18, Color("514e76"))
-		draw_circle(pos + Vector2(radius * 0.3, -radius * 0.25), radius * 0.12, Color("514e76"))
+		_draw_antenna_hazard(pos, item, swing)
 	else:
-		draw_circle(pos, radius * 1.5, Color(1.0, 0.88, 0.45, 0.14))
-		_draw_text("✦", pos + Vector2(-12, 9), 27, Color("ffe78a"))
+		_draw_signal_beacon(pos, item, swing)
+
+func _draw_antenna_hazard(pos: Vector2, item: Dictionary, swing: float) -> void:
+	var height := float(item["height"]) * 1.15
+	var x := pos.x + swing
+	var body := Rect2(x - 6.0, pos.y, 12.0, height)
+	draw_rect(body, Color("3f3d69"))
+	draw_rect(Rect2(x - 17.0, pos.y + 10.0, 34.0, 6.0), Color("b4c4ff"))
+	draw_line(Vector2(x, pos.y + 8.0), Vector2(x - 18.0, pos.y + 28.0), Color("ffe38a"), 2.0)
+	draw_line(Vector2(x, pos.y + 12.0), Vector2(x + 18.0, pos.y + 30.0), Color("ffe38a"), 2.0)
+	draw_line(Vector2(x, pos.y + 20.0), Vector2(x - 14.0, pos.y + 52.0), Color("dfe8ff"), 2.0)
+	draw_line(Vector2(x, pos.y + 18.0), Vector2(x + 16.0, pos.y + 52.0), Color("dfe8ff"), 2.0)
+	draw_rect(Rect2(x - 8.0, pos.y + height - 12.0, 16.0, 10.0), Color("262740"))
+	draw_arc(pos + Vector2(0.0, -4.0), 10.0, 0.0, TAU, 16, Color("ff9b8b"), 2.0)
+
+func _draw_signal_beacon(pos: Vector2, item: Dictionary, swing: float) -> void:
+	var height := float(item["height"])
+	var x := pos.x + swing
+	draw_rect(Rect2(x - 5.0, pos.y, 10.0, height), Color("76e0ff"))
+	draw_rect(Rect2(x - 18.0, pos.y + 14.0, 36.0, 8.0), Color("e9ff7a"))
+	draw_line(Vector2(x, pos.y + 10.0), Vector2(x - 18.0, pos.y + 30.0), Color("fffce4"), 2.0)
+	draw_line(Vector2(x, pos.y + 10.0), Vector2(x + 18.0, pos.y + 30.0), Color("fffce4"), 2.0)
+	draw_line(Vector2(x, pos.y + 18.0), Vector2(x - 12.0, pos.y + 42.0), Color("fffce4"), 2.0)
+	draw_line(Vector2(x, pos.y + 18.0), Vector2(x + 12.0, pos.y + 42.0), Color("fffce4"), 2.0)
+	draw_circle(pos + Vector2(0.0, -4.0), 8.0, Color(1.0, 0.96, 0.72, 0.7))
+	draw_circle(pos + Vector2(0.0, -4.0), 4.0, Color("ffe781"))
 
 func _draw_ship(pos: Vector2) -> void:
-	var flame := PackedVector2Array([pos + Vector2(-5, 10), pos + Vector2(0, rng.randf_range(22, 31)), pos + Vector2(5, 10)])
+	var flame := PackedVector2Array([pos + Vector2(-5, 10), pos + Vector2(0, rng.randf_range(20, 30)), pos + Vector2(5, 10)])
 	draw_colored_polygon(flame, Color("8c8dff"))
-	var points := PackedVector2Array([pos + Vector2(0, -19), pos + Vector2(14, 14), pos + Vector2(0, 8), pos + Vector2(-14, 14)])
-	draw_colored_polygon(points, Color("d5fbff"))
-	draw_circle(pos + Vector2(0, -2), 4, Color("697be0"))
+	var body := PackedVector2Array([pos + Vector2(0, -20), pos + Vector2(14, 14), pos + Vector2(0, 8), pos + Vector2(-14, 14)])
+	draw_colored_polygon(body, Color("d5fbff"))
+	draw_rect(Rect2(pos.x - 10, pos.y + 3, 20, 8), Color("697be0"))
+	draw_rect(Rect2(pos.x - 3, pos.y - 10, 6, 10), Color("7cf5ff"))
 
 func _draw_text(text: String, pos: Vector2, size: int, color: Color) -> void:
 	if font:
