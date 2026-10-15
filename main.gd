@@ -1,6 +1,6 @@
 extends Node2D
 
-## Kosmiczny kurier: bardziej retro, z antenami i większym marginesem od gracza.
+## Kosmiczny kurier: retro 8-bit styl, anteny inspirowane wieżą radiostacji w Gliwicach / Wieżą Eiffla.
 const PLAYER_Y_RATIO := 0.82
 const PLAYER_SPEED := 520.0
 const MAX_LIVES := 3
@@ -19,6 +19,10 @@ var pointer_active := false
 var pointer_x := 0.0
 var best_score := 0
 var font: Font
+
+# Pixel snap to emulate 8-bit feel
+func _snap(v: Vector2) -> Vector2:
+	return Vector2(round(v.x), round(v.y))
 
 func _ready() -> void:
 	rng.randomize()
@@ -117,9 +121,9 @@ func _process(delta: float) -> void:
 			player_x += direction * PLAYER_SPEED * dt
 		player_x = clampf(player_x, 24.0, screen_size.x - 24.0)
 		spawn_timer += dt
-		var interval := maxf(0.42, 0.92 - score * 0.0045)
-		if score >= 100:
-			interval = maxf(0.48, interval + (score - 100.0) * 0.0022)
+		# Spawning interval: gentler acceleration and cap after 100 points
+		var capped_score := minf(score, 100.0)
+		var interval := maxf(0.48, 0.92 - capped_score * 0.0030)
 		if spawn_timer >= interval:
 			spawn_timer = 0.0
 			_spawn_item()
@@ -130,12 +134,13 @@ func _spawn_item() -> void:
 	var is_asteroid := rng.randf() < 0.62
 	var x := rng.randf_range(28.0, screen_size.x - 28.0)
 	var tries := 0
-	while absf(x - player_x) < 160.0 and tries < 18:
+	# Zwiększony odstęp poziomy od gracza żeby było mniej konfuzji
+	while absf(x - player_x) < 220.0 and tries < 24:
 		x = rng.randf_range(28.0, screen_size.x - 28.0)
 		tries += 1
 	items.append({
 		"x": x,
-		"y": -48.0,
+		"y": -80.0, # start wyżej - wyraźniejszy odstęp
 		"radius": rng.randf_range(15.0, 22.0) if is_asteroid else 14.0,
 		"asteroid": is_asteroid,
 		"rotation": rng.randf_range(0.0, TAU),
@@ -146,15 +151,18 @@ func _spawn_item() -> void:
 	})
 
 func _update_items(delta: float) -> void:
-	var fall_speed := 210.0 + minf(score * 0.18, 190.0)
+	# Fall speed: reduce acceleration to make game fairer after 100 points
+	var base_speed := 210.0
+	var fall_speed := base_speed + minf(score * 0.12, 120.0)
 	if score >= 100:
-		fall_speed = 210.0 + minf(100.0 * 0.18, 190.0) + (score - 100.0) * 0.08
+		fall_speed = base_speed + minf(100.0 * 0.12, 120.0) + (score - 100.0) * 0.04
 	for i in range(items.size() - 1, -1, -1):
 		var item := items[i]
 		item["y"] = float(item["y"]) + fall_speed * (1.0 if item["asteroid"] else 0.82) * delta
 		item["rotation"] = float(item["rotation"]) + float(item["spin"]) * delta
 		var player_pos := Vector2(player_x, screen_size.y * PLAYER_Y_RATIO)
-		if player_pos.distance_to(Vector2(float(item["x"]), float(item["y"]))) < float(item["radius"]) + 15.0:
+		# Zwiększony margines od kolizji, tak aby była odczuwalna przerwa i mniej konfuzji przy klikaniu
+		if player_pos.distance_to(Vector2(float(item["x"]), float(item["y"]))) < float(item["radius"]) + 24.0:
 			if item["asteroid"]:
 				lives -= 1
 				if lives <= 0:
@@ -173,6 +181,8 @@ func _draw() -> void:
 	draw_circle(screen_size * Vector2(0.5, 0.42), screen_size.y * 0.62, Color(0.12, 0.14, 0.34, 0.24))
 	for star in stars:
 		var p: Vector2 = star["pos"]
+		# Pixelate star positions a bit for retro look
+		p = _snap(p)
 		draw_circle(p, float(star["size"]), Color(0.82, 0.89, 1.0, float(star["alpha"])))
 	_draw_hud()
 	if running:
@@ -204,42 +214,68 @@ func _draw_item(item: Dictionary) -> void:
 	var pos := Vector2(float(item["x"]), float(item["y"]))
 	var swing := sin(elapsed * 3.8 + float(item["phase"])) * 5.0
 	if item["asteroid"]:
-		_draw_antenna_hazard(pos, item, swing)
+		_draw_antenna_hazard(pos + Vector2(swing, 0.0), item)
 	else:
-		_draw_signal_beacon(pos, item, swing)
+		_draw_signal_beacon(pos + Vector2(swing, 0.0), item)
 
-func _draw_antenna_hazard(pos: Vector2, item: Dictionary, swing: float) -> void:
+func _draw_antenna_hazard(pos: Vector2, item: Dictionary) -> void:
+	# Lattice tower stylizowany na wiezę radiową / Eiffel
 	var height := float(item["height"]) * 1.15
-	var x := pos.x + swing
-	var body := Rect2(x - 6.0, pos.y, 12.0, height)
-	draw_rect(body, Color("3f3d69"))
-	draw_rect(Rect2(x - 17.0, pos.y + 10.0, 34.0, 6.0), Color("b4c4ff"))
-	draw_line(Vector2(x, pos.y + 8.0), Vector2(x - 18.0, pos.y + 28.0), Color("ffe38a"), 2.0)
-	draw_line(Vector2(x, pos.y + 12.0), Vector2(x + 18.0, pos.y + 30.0), Color("ffe38a"), 2.0)
-	draw_line(Vector2(x, pos.y + 20.0), Vector2(x - 14.0, pos.y + 52.0), Color("dfe8ff"), 2.0)
-	draw_line(Vector2(x, pos.y + 18.0), Vector2(x + 16.0, pos.y + 52.0), Color("dfe8ff"), 2.0)
-	draw_rect(Rect2(x - 8.0, pos.y + height - 12.0, 16.0, 10.0), Color("262740"))
-	draw_arc(pos + Vector2(0.0, -4.0), 10.0, 0.0, TAU, 16, Color("ff9b8b"), 2.0)
+	var x := round(pos.x)
+	var top := Vector2(x, pos.y)
+	var bottom := Vector2(x, pos.y + height)
+	# central pole (blocky)
+	draw_rect(Rect2(x - 3, pos.y, 6, height), Color("2b2b3f"))
+	# triangular legs - pixelated lines
+	var steps := int(height / 10)
+	for s in range(steps + 1):
+		var t := float(s) / max(1, steps)
+		var left_x := lerp(x - 28, x - 6, t)
+		var right_x := lerp(x + 28, x + 6, t)
+		var y := pos.y + t * height
+		# horizontal crossbars
+		if s % 2 == 0:
+			draw_line(Vector2(left_x, y), Vector2(right_x, y), Color("6fa8ff"), 2.0)
+		# diagonal lattice lines
+		draw_line(Vector2(left_x, y), Vector2(x - 3, pos.y + t * height), Color("8aa0c4"), 1.6)
+		draw_line(Vector2(right_x, y), Vector2(x + 3, pos.y + t * height), Color("8aa0c4"), 1.6)
+	# small antennas / metal pieces
+	for a in range(3):
+		var ay := pos.y + 8.0 + a * (height / 3.0)
+		draw_rect(Rect2(x - 1, ay, 2, 12), Color("dfe8ff"))
+		draw_line(Vector2(x, ay + 4), Vector2(x - 18, ay + 8), Color("ffe38a"), 2.0)
+		draw_line(Vector2(x, ay + 6), Vector2(x + 18, ay + 10), Color("ffe38a"), 2.0)
+	# base platform
+	draw_rect(Rect2(x - 22, pos.y + height - 10, 44, 10), Color("262740"))
 
-func _draw_signal_beacon(pos: Vector2, item: Dictionary, swing: float) -> void:
+func _draw_signal_beacon(pos: Vector2, item: Dictionary, ) -> void:
+	# Antenna / metal scrap look for beacons
 	var height := float(item["height"])
-	var x := pos.x + swing
-	draw_rect(Rect2(x - 5.0, pos.y, 10.0, height), Color("76e0ff"))
-	draw_rect(Rect2(x - 18.0, pos.y + 14.0, 36.0, 8.0), Color("e9ff7a"))
-	draw_line(Vector2(x, pos.y + 10.0), Vector2(x - 18.0, pos.y + 30.0), Color("fffce4"), 2.0)
-	draw_line(Vector2(x, pos.y + 10.0), Vector2(x + 18.0, pos.y + 30.0), Color("fffce4"), 2.0)
-	draw_line(Vector2(x, pos.y + 18.0), Vector2(x - 12.0, pos.y + 42.0), Color("fffce4"), 2.0)
-	draw_line(Vector2(x, pos.y + 18.0), Vector2(x + 12.0, pos.y + 42.0), Color("fffce4"), 2.0)
-	draw_circle(pos + Vector2(0.0, -4.0), 8.0, Color(1.0, 0.96, 0.72, 0.7))
-	draw_circle(pos + Vector2(0.0, -4.0), 4.0, Color("ffe781"))
+	var x := round(pos.x)
+	# main thin rod
+	draw_rect(Rect2(x - 2, pos.y, 4, height), Color("76e0ff"))
+	# crossbars and clamps
+	for i in range(3):
+		var y := pos.y + 12 + i * (height / 3.0)
+		draw_rect(Rect2(x - 12, y, 24, 4), Color("cfe8ff"))
+		draw_rect(Rect2(x - 2, y - 2, 4, 8), Color("dfe8ff"))
+	# small antenna tips
+	draw_rect(Rect2(x - 6, pos.y - 8, 12, 6), Color("ffe781"))
+	# round signal glow - make pixelated by drawing two concentric circles
+	draw_circle(Vector2(x, pos.y - 6), 8.0, Color(1.0, 0.96, 0.72, 0.55))
+	draw_circle(Vector2(x, pos.y - 6), 4.0, Color("ffe781"))
 
 func _draw_ship(pos: Vector2) -> void:
-	var flame := PackedVector2Array([pos + Vector2(-5, 10), pos + Vector2(0, rng.randf_range(20, 30)), pos + Vector2(5, 10)])
-	draw_colored_polygon(flame, Color("8c8dff"))
-	var body := PackedVector2Array([pos + Vector2(0, -20), pos + Vector2(14, 14), pos + Vector2(0, 8), pos + Vector2(-14, 14)])
-	draw_colored_polygon(body, Color("d5fbff"))
-	draw_rect(Rect2(pos.x - 10, pos.y + 3, 20, 8), Color("697be0"))
-	draw_rect(Rect2(pos.x - 3, pos.y - 10, 6, 10), Color("7cf5ff"))
+	# Blocky 8-bit ship
+	pos = _snap(pos)
+	# body
+	draw_rect(Rect2(pos.x - 12, pos.y - 16, 24, 12), Color("d5fbff"))
+	# cockpit
+	draw_rect(Rect2(pos.x - 6, pos.y - 22, 12, 8), Color("7cf5ff"))
+	# thruster
+	draw_rect(Rect2(pos.x - 6, pos.y + 2, 12, 10), Color("697be0"))
+	# small pixel flame
+	draw_rect(Rect2(pos.x - 3, pos.y + 12, 3, 8), Color("8c8dff"))
 
 func _draw_text(text: String, pos: Vector2, size: int, color: Color) -> void:
 	if font:
