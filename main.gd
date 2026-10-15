@@ -195,8 +195,8 @@ func _draw() -> void:
 	draw_player(px_vis, py)
 
 	for sp in sparks:
-		var p := sp["pos"]
-		var life := sp["life"]
+		var p: Vector2 = sp["pos"]
+		var life: float = float(sp["life"])
 		var a := clamp(life / 0.32, 0.0, 1.0)
 		for j in 3:
 			draw_rect(Rect2(p.x - 2 + j * 2, p.y - j * 2, 2, 2), Color(1, 0.8, 0.2, a))
