@@ -1,0 +1,63 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+
+ <g>
+  <title>Layer 1</title>
+  <g stroke="null">
+
+   <!-- ramiona -->
+   <rect stroke="null" fill="#1f4db0" class="shirt" height="98.50909" width="37.39583" y="210.4232" x="242.95834"/>
+   <rect stroke="null" fill="#1f4db0" class="shirt" height="98.50909" width="37.39583" y="210.4232" x="534.64584"/>
+   <rect stroke="null" fill="#163d8d" class="shirt-dark" height="28.14545" width="52.35417" y="231.53229" x="228.00001"/>
+   <rect stroke="null" fill="#163d8d" class="shirt-dark" height="28.14545" width="52.35417" y="231.53229" x="534.64584"/>
+   <!-- głowa -->
+   <rect stroke="null" fill="#f3c78a" class="skin" height="105.54545" width="149.58333" y="97.84138" x="332.70834"/>
+   <rect stroke="null" fill="#3d2a1d" class="hair" height="21.10909" width="134.625" y="83.76866" x="340.18751"/>
+   <!-- oczy -->
+   <rect stroke="null" fill="#111827" class="outline" height="28.14545" width="29.91667" y="133.0232" x="362.62501"/>
+   <rect stroke="null" fill="#111827" class="outline" height="28.14545" width="29.91667" y="133.0232" x="422.45834"/>
+   <!-- usta / nos -->
+   <rect stroke="null" fill="#d14f3f" class="red" height="14.07273" width="29.91667" y="161.16866" x="392.54168"/>
+   <!-- broda -->
+   <rect stroke="null" fill="#3d2a1d" class="hair" height="42.21818" width="134.625" y="189.31411" x="340.18751"/>
+   <!-- korpus -->
+   <rect stroke="null" fill="#1f4db0" class="shirt" height="126.65455" width="224.375" y="217.45957" x="295.31251"/>
+   <rect stroke="null" fill="#163d8d" class="shirt-dark" height="49.25455" width="44.875" y="217.45957" x="295.31251"/>
+   <rect stroke="null" fill="#163d8d" class="shirt-dark" height="49.25455" width="44.875" y="217.45957" x="474.81251"/>
+   <rect stroke="null" fill="#163d8d" class="shirt-dark" height="21.10909" width="149.58333" y="238.56866" x="332.70834"/>
+   <rect stroke="null" fill="#163d8d" class="shirt-dark" height="21.10909" width="179.5" y="266.71411" x="317.75001"/>
+   <!-- małe żółte ZSTI na koszulce -->
+   <!-- Z -->
+   <rect stroke="null" fill="#f2c335" class="gold" height="14.07273" width="37.39583" y="224.49593" x="347.66668"/>
+   <rect stroke="null" fill="#f2c335" class="gold" height="21.10909" width="14.95833" y="238.56866" x="347.66668"/>
+   <rect stroke="null" fill="#f2c335" class="gold" height="14.07273" width="37.39583" y="259.67775" x="370.10418"/>
+   <!-- S -->
+   <rect stroke="null" fill="#f2c335" class="gold" height="14.07273" width="37.39583" y="224.49593" x="407.50001"/>
+   <rect stroke="null" fill="#f2c335" class="gold" height="14.07273" width="14.95833" y="238.56866" x="407.50001"/>
+   <rect stroke="null" fill="#f2c335" class="gold" height="14.07273" width="14.95833" y="252.64138" x="429.93751"/>
+   <rect stroke="null" fill="#f2c335" class="gold" height="14.07273" width="37.39583" y="266.71411" x="407.50001"/>
+   <!-- T -->
+   <rect stroke="null" fill="#f2c335" class="gold" height="14.07273" width="37.39583" y="224.49593" x="452.37501"/>
+   <rect stroke="null" fill="#f2c335" class="gold" height="42.21818" width="7.47917" y="238.56866" x="467.33334"/>
+   <!-- I -->
+   <rect stroke="null" fill="#f2c335" class="gold" height="56.29091" width="14.95833" y="224.49593" x="497.25001"/>
+   <!-- pasek -->
+   <rect stroke="null" fill="#111827" class="outline" height="21.10909" width="194.45833" y="344.11411" x="310.27084"/>
+   <!-- spodnie -->
+   <rect stroke="null" fill="#2a3747" class="pants" height="77.4" width="59.83333" y="365.2232" x="325.22918"/>
+   <rect stroke="null" fill="#2a3747" class="pants" height="77.4" width="59.83333" y="365.2232" x="429.93751"/>
+   <!-- buty -->
+   <rect stroke="null" fill="#111827" class="shoe" height="28.14545" width="74.79167" y="442.6232" x="317.75001"/>
+   <rect stroke="null" fill="#111827" class="shoe" height="28.14545" width="74.79167" y="442.6232" x="422.45834"/>
+   <!-- detale krawędzi dla bardziej „pixel” wyglądu -->
+   <rect stroke="null" fill="#111827" class="outline" height="126.65455" width="14.95833" y="217.45957" x="295.31251"/>
+   <rect stroke="null" fill="#111827" class="outline" height="126.65455" width="14.95833" y="217.45957" x="504.72918"/>
+   <rect stroke="null" fill="#111827" class="outline" height="105.54545" width="14.95833" y="97.84138" x="332.70834"/>
+   <rect stroke="null" fill="#111827" class="outline" height="105.54545" width="14.95833" y="97.84138" x="467.33334"/>
+   <!-- małe światło -->
+   <rect stroke="null" fill="#f3f4f6" class="white" height="7.03636" width="14.95833" y="259.67775" x="355.14584"/>
+   <rect stroke="null" fill="#f3f4f6" class="white" height="7.03636" width="14.95833" y="259.67775" x="444.89584"/>
+  </g>
+  <rect stroke="null" id="svg_4" height="69.56522" width="164.36081" y="220.29072" x="339.99999" fill="#1f4db0"/>
+  <text opacity="0.95" transform="matrix(1.3529 0 0 1 -171.713 0)" stroke="null" xml:space="preserve" text-anchor="start" font-family="Noto Sans JP" font-size="24" stroke-width="0" id="svg_5" y="252.68656" x="434.71767" fill="#ffff56">ZSTI</text>
+ </g>
+</svg>
