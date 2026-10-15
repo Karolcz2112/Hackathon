@@ -3,162 +3,52 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>City Drive 3D</title>
+  <title>City Drive 3D — ulepszona wersja</title>
   <style>
-    :root {
-      --bg: #07151f;
-      --panel: rgba(11, 18, 26, 0.8);
-      --line: rgba(255,255,255,0.08);
-      --cyan: #63e8ff;
-      --text: #edf8ff;
-      --muted: #9eb7c8;
-      --gold: #ffd166;
-      --red: #ff5f6d;
+    :root{
+      --bg:#07151f; --panel:rgba(11,18,26,0.85); --line:rgba(255,255,255,0.06);
+      --cyan:#63e8ff; --text:#edf8ff; --muted:#9eb7c8; --gold:#ffd166; --red:#ff5f6d;
     }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter, "Segoe UI", sans-serif;background:radial-gradient(circle at 10% 10%, rgba(99,232,255,0.06), transparent 25%), linear-gradient(180deg,#07151f 0%, #071827 100%);color:var(--text)}
+    body{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:1rem;gap:0.9rem}
 
-    * { box-sizing: border-box; }
-    html, body {
-      margin: 0;
-      height: 100%;
-      background: radial-gradient(circle at top, rgba(99,232,255,0.2), transparent 30%), linear-gradient(180deg, #07151f 0%, #0b1722 100%);
-      color: var(--text);
-      font-family: Inter, "Segoe UI", sans-serif;
-    }
+    .topbar{width:min(1200px,calc(100vw - 2rem));display:flex;align-items:center;justify-content:space-between;gap:1rem;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:0.85rem 1rem;box-shadow:0 18px 38px rgba(0,0,0,0.32)}
+    .brand h1{margin:0;font-size:clamp(1.1rem,1.6vw + 0.6rem,2rem)}
+    .brand span{color:var(--muted);font-size:0.82rem}
 
-    body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.75rem;
-      padding: 1rem;
-    }
+    .hud{display:flex;flex-wrap:wrap;gap:0.6rem;align-items:center}
+    .stat{min-width:96px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);border-radius:10px;padding:0.45rem 0.7rem}
+    .stat .label{display:block;font-size:0.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06rem}
+    .stat .value{display:block;font-weight:800;margin-top:0.15rem;font-size:1rem}
 
-    .topbar {
-      width: min(1200px, calc(100vw - 2rem));
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      background: rgba(11,18,26,0.74);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 0.9rem 1rem;
-      box-shadow: 0 18px 38px rgba(0,0,0,0.28);
-    }
+    .controls{display:flex;gap:0.5rem;align-items:center}
+    .btn{background:linear-gradient(180deg, rgba(99,232,255,0.12), rgba(26,163,198,0.06));border:1px solid rgba(99,232,255,0.2);padding:0.45rem 0.6rem;border-radius:10px;color:var(--text);font-weight:700;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid var(--line)}
 
-    .brand h1 {
-      margin: 0;
-      font-size: clamp(1.15rem, 1.4vw + 0.9rem, 2rem);
-    }
+    .game-wrap{width:min(1200px,calc(100vw - 2rem));height:min(820px,calc(100vh - 160px));position:relative;background:linear-gradient(180deg, rgba(8,18,26,0.95), rgba(10,20,30,0.99));border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 20px 48px rgba(0,0,0,0.38)}
 
-    .brand span {
-      color: var(--muted);
-      font-size: 0.8rem;
-    }
+    canvas{width:100%;height:100%;display:block;background:linear-gradient(180deg,#0a1d2e 0%, #0d2941 45%, #102b3d 100%)}
 
-    .hud {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.7rem;
-      align-items: center;
-    }
+    .overlay{position:absolute;left:1rem;bottom:1rem;background:rgba(7,18,26,0.7);border:1px solid rgba(99,232,255,0.16);border-radius:12px;padding:0.6rem 0.75rem;backdrop-filter:blur(6px);max-width:340px;z-index:30}
+    .overlay strong{display:block;color:var(--cyan);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06rem;margin-bottom:0.18rem}
+    .overlay span{color:var(--text);font-size:0.95rem;line-height:1.35}
 
-    .stat {
-      min-width: 110px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 12px;
-      padding: 0.5rem 0.8rem;
-    }
+    .fab{position:absolute;right:1rem;bottom:1rem;z-index:30}
 
-    .stat .label {
-      display: block;
-      font-size: 0.66rem;
-      color: var(--muted);
-      letter-spacing: 0.08rem;
-      text-transform: uppercase;
-    }
+    .touch-controls{position:absolute;left:50%;transform:translateX(-50%);bottom:18px;display:none;gap:10px;z-index:40}
+    .touch-controls .tbtn{width:72px;height:56px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center;color:var(--text);font-weight:800;touch-action:none}
+    .hud .small{font-size:0.8rem}
 
-    .stat .value {
-      display: block;
-      font-weight: 900;
-      margin-top: 0.2rem;
-      font-size: 1.1rem;
-    }
+    .top-left-panel{position:absolute;left:1rem;top:1rem;background:rgba(7,18,26,0.6);padding:0.6rem;border-radius:10px;border:1px solid rgba(255,255,255,0.03);z-index:30}
 
-    .game-wrap {
-      width: min(1200px, calc(100vw - 2rem));
-      height: min(780px, calc(100vh - 150px));
-      position: relative;
-      background: linear-gradient(180deg, rgba(8,18,26,0.95), rgba(10,20,30,0.99));
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      overflow: hidden;
-      box-shadow: 0 18px 38px rgba(0,0,0,0.32);
-    }
-
-    canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-      background: linear-gradient(180deg, #0a1d2e 0%, #0d2941 45%, #102b3d 100%);
-    }
-
-    .message {
-      position: absolute;
-      left: 1rem;
-      bottom: 1rem;
-      background: rgba(7,18,26,0.7);
-      border: 1px solid rgba(99,232,255,0.35);
-      border-radius: 12px;
-      padding: 0.75rem 0.9rem;
-      backdrop-filter: blur(6px);
-      max-width: 320px;
-      z-index: 10;
-      pointer-events: none;
-    }
-
-    .message strong {
-      display: block;
-      color: var(--cyan);
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08rem;
-      margin-bottom: 0.2rem;
-    }
-
-    .message span {
-      color: var(--text);
-      font-size: 0.95rem;
-      line-height: 1.4;
-    }
-
-    .button {
-      position: absolute;
-      right: 1rem;
-      bottom: 1rem;
-      z-index: 10;
-      background: linear-gradient(180deg, rgba(99,232,255,0.16), rgba(26,163,198,0.1));
-      border: 1px solid rgba(99,232,255,0.34);
-      color: var(--text);
-      border-radius: 12px;
-      padding: 0.8rem 1rem;
-      cursor: pointer;
-      font-weight: 800;
-    }
-
-    @media (max-width: 760px) {
-      .topbar {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .hud {
-        width: 100%;
-        justify-content: space-between;
-      }
-      .stat { flex: 1 1 27%; min-width: 0; }
-      .game-wrap { height: min(650px, calc(100vh - 210px)); }
+    @media (max-width:760px){
+      .topbar{flex-direction:column;align-items:flex-start}
+      .hud{width:100%;justify-content:space-between}
+      .stat{flex:1 1 27%;min-width:0}
+      .game-wrap{height:min(680px,calc(100vh - 210px))}
+      .touch-controls{display:flex}
+      .overlay{left:8px;right:8px;bottom:90px}
     }
   </style>
 </head>
@@ -166,7 +56,7 @@
   <div class="topbar">
     <div class="brand">
       <h1>City Drive 3D</h1>
-      <span>3D arcade driving — wyprzedzaj, zbieraj pieniądze i unikaj kolizji</span>
+      <span>3D arcade driving — ulepszona wersja z zapisanym highscore i obsługą mobilną</span>
     </div>
 
     <div class="hud">
@@ -175,339 +65,271 @@
       <div class="stat"><span class="label">Time</span><span class="value" id="time">90</span></div>
       <div class="stat"><span class="label">Fuel</span><span class="value" id="fuel">100%</span></div>
       <div class="stat"><span class="label">Speed</span><span class="value" id="speed">0</span></div>
+      <div class="stat"><span class="label">Highscore</span><span class="value" id="highscore">0</span></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn" id="pauseBtn">Pause</button>
+      <button class="btn" id="restartBtn">Restart</button>
+      <button class="btn ghost" id="soundBtn">Sound: On</button>
     </div>
   </div>
 
   <div class="game-wrap">
-    <canvas id="gameCanvas"></canvas>
-    <div class="message">
+    <canvas id="gameCanvas" role="img" aria-label="City Drive 3D canvas"></canvas>
+
+    <div class="overlay" id="missionBox">
       <strong>Mission</strong>
-      <span id="missionText">Jedź, zbieraj pieniądze i nie rozbij się.</span>
+      <span id="missionText">Jedź, zbieraj pieniądze i nie rozbij się. Steruj strzałkami / WASD lub dotykiem.</span>
     </div>
-    <button class="button" id="restartBtn">Restart</button>
+
+    <div class="top-left-panel" id="scorePanel" style="display:none">
+      <div class="small">Najlepsze wyniki:</div>
+      <div id="bestList"></div>
+    </div>
+
+    <div class="fab">
+      <button class="btn" id="showLeaderboard">Leaderboard</button>
+    </div>
+
+    <div class="touch-controls" id="touchControls">
+      <div class="tbtn" id="tLeft">◀</div>
+      <div style="display:flex;gap:8px">
+        <div class="tbtn" id="tBrake">↓</div>
+        <div class="tbtn" id="tAccel">↑</div>
+      </div>
+      <div class="tbtn" id="tRight">▶</div>
+    </div>
+
   </div>
 
   <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
+    // Utilities
+    const $ = (id) => document.getElementById(id);
 
-    const scoreEl = document.getElementById('score');
-    const cashEl = document.getElementById('cash');
-    const timeEl = document.getElementById('time');
-    const fuelEl = document.getElementById('fuel');
-    const speedEl = document.getElementById('speed');
-    const missionTextEl = document.getElementById('missionText');
-    const restartBtn = document.getElementById('restartBtn');
+    const canvas = $('gameCanvas');
+    const ctx = canvas.getContext('2d', { alpha: false });
+    const scoreEl = $('score'), cashEl = $('cash'), timeEl = $('time'), fuelEl = $('fuel'), speedEl = $('speed'), missionTextEl = $('missionText');
+    const restartBtn = $('restartBtn'), pauseBtn = $('pauseBtn'), soundBtn = $('soundBtn'), showLeaderboard = $('showLeaderboard');
+    const touchControls = $('touchControls');
 
-    let w = 0;
-    let h = 0;
-    let road = { width: 420, half: 210, centerY: 0 };
-    let game = null;
-
-    function resize() {
+    // HiDPI / resize handling
+    let w = 800, h = 600;
+    function resizeCanvas(){
       const rect = canvas.getBoundingClientRect();
-      const ratio = window.devicePixelRatio || 1;
-      w = Math.max(300, rect.width);
-      h = Math.max(300, rect.height);
-      canvas.width = Math.floor(w * ratio);
-      canvas.height = Math.floor(h * ratio);
-      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = Math.max(320, rect.width);
+      h = Math.max(320, rect.height);
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    new ResizeObserver(resizeCanvas).observe(canvas);
+    resizeCanvas();
+
+    // Sound (optional) - small inline sine for engine + samples (generated or silent if not allowed)
+    let audioCtx = null;
+    let soundOn = true;
+    function ensureAudio(){
+      if (!audioCtx){
+        try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){audioCtx=null}
+      }
     }
 
-    window.addEventListener('resize', resize);
-    resize();
+    function playBeep(freq,duration=0.08, volume=0.06){
+      if (!soundOn) return; ensureAudio(); if(!audioCtx) return;
+      const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+      o.type = 'sine'; o.frequency.value = freq; g.gain.value = volume;
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(); o.stop(audioCtx.currentTime + duration);
+    }
 
-    const keys = {
-      left: false,
-      right: false,
-      up: false,
-      down: false
-    };
+    soundBtn.addEventListener('click', ()=>{ soundOn = !soundOn; soundBtn.textContent = `Sound: ${soundOn? 'On':'Off'}`; if(soundOn) ensureAudio(); });
 
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') keys.left = true;
-      if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') keys.right = true;
-      if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') keys.up = true;
-      if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') keys.down = true;
+    // Controls
+    const keys = {left:false,right:false,up:false,down:false};
+    window.addEventListener('keydown', (e)=>{
+      const k = e.key.toLowerCase();
+      if(k==='arrowleft' || k==='a') keys.left = true;
+      if(k==='arrowright' || k==='d') keys.right = true;
+      if(k==='arrowup' || k==='w') keys.up = true;
+      if(k==='arrowdown' || k==='s') keys.down = true;
+    });
+    window.addEventListener('keyup', (e)=>{
+      const k = e.key.toLowerCase();
+      if(k==='arrowleft' || k==='a') keys.left = false;
+      if(k==='arrowright' || k==='d') keys.right = false;
+      if(k==='arrowup' || k==='w') keys.up = false;
+      if(k==='arrowdown' || k==='s') keys.down = false;
     });
 
-    window.addEventListener('keyup', (e) => {
-      if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') keys.left = false;
-      if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') keys.right = false;
-      if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') keys.up = false;
-      if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') keys.down = false;
-    });
+    // Touch controls
+    const tc = {left:false,right:false,up:false,down:false};
+    function bindTouch(id, keyName){
+      const el = $(id);
+      if(!el) return;
+      el.addEventListener('touchstart', (e)=>{ e.preventDefault(); tc[keyName]=true; });
+      el.addEventListener('touchend', (e)=>{ e.preventDefault(); tc[keyName]=false; });
+      el.addEventListener('touchcancel', (e)=>{ e.preventDefault(); tc[keyName]=false; });
+    }
+    bindTouch('tLeft','left'); bindTouch('tRight','right'); bindTouch('tAccel','up'); bindTouch('tBrake','down');
 
-    function resetGame() {
+    // Game state
+    let game = null;
+    function resetGame(){
       game = {
-        running: true,
-        score: 0,
-        cash: 0,
-        timeLeft: 90,
-        fuel: 100,
-        speed: 0,
-        maxSpeed: 260,
-        roadOffset: 0,
-        playerLane: 0,
-        playerX: 0,
-        obstacles: [],
-        coins: [],
-        lastSpawn: 0,
-        lastCoin: 0,
-        lastTime: 0,
-        shake: 0,
-        mission: 'Jedź, zbieraj pieniądze i nie rozbij się.'
+        running: true, score:0, cash:0, timeLeft:90, fuel:100, speed:0, maxSpeed:260,
+        roadOffset:0, playerLane:0, playerX:0, playerTargetLane:0,
+        obstacles:[], coins:[], particles:[], shake:0, mission: 'Jedź, zbieraj pieniądze i nie rozbij się.',
+        lastSpawn:0, lastCoin:0, lastTime:0, highscore: loadHighscore()
       };
-    }
-
-    resetGame();
-
-    function spawnObstacle() {
-      const lane = Math.floor(Math.random() * 3) - 1;
-      const z = 1.2;
-      const color = ['#ff7b72', '#fbbf24', '#60a5fa', '#a78bfa', '#34d399'][Math.floor(Math.random() * 5)];
-      game.obstacles.push({ lane, z, color, width: 40, height: 60 });
-    }
-
-    function spawnCoin() {
-      const lane = Math.floor(Math.random() * 3) - 1;
-      game.coins.push({ lane, z: 1.2, r: 14, value: 25 });
-    }
-
-    function updateGame(dt) {
-      if (!game.running) return;
-
-      const accel = keys.up ? 140 : 0;
-      const brake = keys.down ? 220 : 0;
-      const steer = (keys.left ? -1 : 0) + (keys.right ? 1 : 0);
-
-      if (keys.up) game.speed += accel * dt;
-      if (keys.down) game.speed -= brake * dt;
-      if (!keys.up && !keys.down) game.speed *= 0.985;
-
-      game.speed = Math.max(0, Math.min(game.maxSpeed, game.speed));
-      game.playerLane += steer * dt * 2.5;
-      game.playerLane = Math.max(-1.2, Math.min(1.2, game.playerLane));
-      game.playerX = game.playerLane * 170;
-
-      game.roadOffset += game.speed * dt * 0.9;
-      game.timeLeft -= dt;
-      game.fuel = Math.max(0, game.fuel - dt * (game.speed / 70) + (keys.down ? 0.1 : 0));
-
-      if (game.timeLeft <= 0 || game.fuel <= 0) {
-        game.running = false;
-        game.mission = 'Koniec gry — kliknij Restart.';
-      }
-
-      if (Math.random() < 0.018 + dt * 0.5) spawnObstacle();
-      if (Math.random() < 0.012 + dt * 0.3) spawnCoin();
-
-      for (let i = game.obstacles.length - 1; i >= 0; i--) {
-        const o = game.obstacles[i];
-        o.z += (0.6 + game.speed / 180) * dt;
-        if (o.z > 1.8) {
-          game.obstacles.splice(i, 1);
-          game.score += 10;
-        }
-
-        if (o.z > 1.1 && o.z < 1.4) {
-          const close = Math.abs(o.lane - game.playerLane) < 0.55;
-          if (close) {
-            game.running = false;
-            game.mission = 'Kolizja! Wystarczy restart.';
-            game.shake = 0.6;
-          }
-        }
-      }
-
-      for (let i = game.coins.length - 1; i >= 0; i--) {
-        const coin = game.coins[i];
-        coin.z += (0.7 + game.speed / 200) * dt;
-        if (coin.z > 1.8) {
-          game.coins.splice(i, 1);
-          continue;
-        }
-
-        if (coin.z > 1.08 && coin.z < 1.42 && Math.abs(coin.lane - game.playerLane) < 0.45) {
-          game.cash += coin.value;
-          game.score += 60;
-          game.coins.splice(i, 1);
-          game.mission = 'Dobrze! Złapana nagroda.';
-        }
-      }
-
-      if (game.score > 0 && game.score % 900 < 20 && game.cash > 0 && game.running) {
-        game.maxSpeed = Math.min(340, game.maxSpeed + 0.02);
-      }
-
-      game.shake = Math.max(0, game.shake - dt * 1.4);
       updateHud();
     }
 
-    function updateHud() {
-      scoreEl.textContent = Math.floor(game.score);
-      cashEl.textContent = Math.floor(game.cash);
-      timeEl.textContent = Math.max(0, Math.ceil(game.timeLeft));
-      fuelEl.textContent = `${Math.ceil(game.fuel)}%`;
-      speedEl.textContent = `${Math.floor(game.speed)} km/h`;
-      missionTextEl.textContent = game.mission;
+    function loadHighscore(){ return Number(localStorage.getItem('cd_highscore') || 0); }
+    function saveHighscore(v){ localStorage.setItem('cd_highscore', String(v)); }
+
+    resetGame();
+
+    // Spawning
+    function spawnObstacle(){
+      const lane = Math.floor(Math.random()*3)-1;
+      const z = 1.2; const color = ['#ff7b72','#fbbf24','#60a5fa','#a78bfa','#34d399'][Math.floor(Math.random()*5)];
+      game.obstacles.push({lane,z,color,w:40,h:60,id:Date.now()+Math.random()});
     }
+    function spawnCoin(){ const lane = Math.floor(Math.random()*3)-1; game.coins.push({lane,z:1.2,r:14,value:25}); }
 
-    function drawBackground() {
-      const sky = ctx.createLinearGradient(0, 0, 0, h * 0.7);
-      sky.addColorStop(0, '#0b1b2c');
-      sky.addColorStop(0.5, '#18314d');
-      sky.addColorStop(1, '#1a3550');
-      ctx.fillStyle = sky;
-      ctx.fillRect(0, 0, w, h);
+    // Particles for speed/impact
+    function emitParticle(x,y,vx,vy,color,size,life){ game.particles.push({x,y,vx,vy,color,size,life,age:0}); }
 
-      const sunX = w * 0.82;
-      const sunY = h * 0.18;
-      const sun = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, 80);
-      sun.addColorStop(0, 'rgba(255, 219, 110, 0.95)');
-      sun.addColorStop(1, 'rgba(255, 219, 110, 0)');
-      ctx.fillStyle = sun;
-      ctx.fillRect(sunX - 120, sunY - 120, 240, 240);
+    // Update loop
+    function updateGame(dt){
+      if(!game.running) return;
+      // merge keyboard + touch
+      const input = {left: keys.left || tc.left, right: keys.right || tc.right, up: keys.up || tc.up, down: keys.down || tc.down};
 
-      for (let i = 0; i < 30; i++) {
-        const x = ((i * 170) % (w + 120)) - 60;
-        const y = 80 + ((i * 90) % 220);
-        const hgt = 30 + ((i * 31) % 80);
-        ctx.fillStyle = 'rgba(16, 24, 31, 0.9)';
-        ctx.fillRect(x, y, 42, hgt);
-        ctx.fillStyle = 'rgba(99,232,255,0.08)';
-        ctx.fillRect(x + 8, y + 8, 12, hgt - 16);
+      const accel = input.up ? 220 : 0;
+      const brake = input.down ? 340 : 0;
+      const steer = (input.left? -1:0) + (input.right? 1:0);
+
+      if(input.up) game.speed += accel * dt; else game.speed *= 0.992;
+      if(input.down) game.speed -= brake * dt;
+      game.speed = Math.max(0, Math.min(game.maxSpeed, game.speed));
+
+      // smooth lane interpolation
+      game.playerTargetLane += steer * dt * 2.5; // adjust target with hold steering
+      game.playerTargetLane = Math.max(-1.2, Math.min(1.2, game.playerTargetLane));
+      // interpolate actual lane for smooth movement
+      game.playerLane += (game.playerTargetLane - game.playerLane) * Math.min(1, dt * 6);
+      game.playerX = game.playerLane * 170;
+
+      game.roadOffset += game.speed * dt * 0.95;
+      game.timeLeft -= dt;
+      game.fuel = Math.max(0, game.fuel - dt * (game.speed/60) + (input.down? 0.08:0));
+
+      if(game.timeLeft <= 0 || game.fuel <= 0){ game.running=false; game.mission='Koniec gry — kliknij Restart.'; game.shake=0.8; playBeep(120,0.4,0.18); }
+
+      // spawn probabilities scale with speed
+      if(Math.random() < 0.012 + dt * (game.speed/120)) spawnObstacle();
+      if(Math.random() < 0.01 + dt * (game.speed/180)) spawnCoin();
+
+      // update obstacles
+      for(let i=game.obstacles.length-1;i>=0;i--){ const o=game.obstacles[i]; o.z += (0.55 + game.speed/180) * dt; if(o.z>1.9){ game.obstacles.splice(i,1); game.score += 10; emitParticle((o.lane*170)+w/2, h-50, (Math.random()-0.5)*6, -20, 'rgba(255,255,255,0.06)', 8, 0.6); } else {
+          // collision check when close
+          if(o.z>1.02 && o.z<1.5){ const close = Math.abs(o.lane - game.playerLane) < 0.5; if(close && Math.abs((1.5 - o.z))<0.6){ game.running=false; game.mission='Kolizja! Wystarczy restart.'; game.shake = 1.0; playBeep(180,0.25,0.25); emitParticle(w/2 + game.playerX, h-140, (Math.random()-0.5)*80, -80, 'rgba(255,90,80,0.9)', 18, 1.2); }}
+        }
       }
+
+      // update coins
+      for(let i=game.coins.length-1;i>=0;i--){ const c=game.coins[i]; c.z += (0.7 + game.speed/200) * dt; if(c.z>1.9){ game.coins.splice(i,1); } else if(c.z>1.06 && c.z<1.45 && Math.abs(c.lane - game.playerLane) < 0.48){ game.cash += c.value; game.score += 60; game.coins.splice(i,1); game.mission='Dobrze! Złapana nagroda.'; playBeep(880,0.08,0.05); emitParticle(w/2 + c.lane*170, h-200, (Math.random()-0.5)*30, -50, 'rgba(255,210,100,0.9)', 10, 0.8); }}
+
+      // difficulty ramp
+      if(game.score>0 && game.score%900 < 30 && game.cash>0 && game.running){ game.maxSpeed = Math.min(380, game.maxSpeed + 0.03); }
+
+      // particles
+      for(let i=game.particles.length-1;i>=0;i--){ const p=game.particles[i]; p.age += dt; if(p.age>p.life) game.particles.splice(i,1); else { p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 60 * dt; p.vx *= 0.99; }}
+
+      game.shake = Math.max(0, game.shake - dt * 1.8);
+      updateHud();
     }
 
-    function drawRoad() {
-      const horizon = h * 0.26;
-      const roadTopWidth = w * 0.18;
-      const roadBottomWidth = w * 0.85;
-      const roadY = h * 0.18;
+    function updateHud(){ scoreEl.textContent = Math.floor(game.score); cashEl.textContent = Math.floor(game.cash); timeEl.textContent = Math.max(0, Math.ceil(game.timeLeft)); fuelEl.textContent = `${Math.ceil(game.fuel)}%`; speedEl.textContent = `${Math.floor(game.speed)} km/h`; $('highscore').textContent = loadHighscore(); missionTextEl.textContent = game.mission; }
 
-      ctx.fillStyle = '#1a202a';
-      ctx.beginPath();
-      ctx.moveTo(w / 2 - roadTopWidth / 2, roadY);
-      ctx.lineTo(w / 2 + roadTopWidth / 2, roadY);
-      ctx.lineTo(w / 2 + roadBottomWidth / 2, h);
-      ctx.lineTo(w / 2 - roadBottomWidth / 2, h);
-      ctx.closePath();
-      ctx.fill();
+    // Drawing helpers
+    function drawBackground(){
+      const sky = ctx.createLinearGradient(0,0,0,h*0.7); sky.addColorStop(0,'#04121a'); sky.addColorStop(0.5,'#082235'); sky.addColorStop(1,'#0b2a3f'); ctx.fillStyle = sky; ctx.fillRect(0,0,w,h);
+      // city silhouette
+      for(let i=0;i<30;i++){ const x = ((i*160)%(w+160))-80; const y = 70 + ((i*67)%160); const hgt = 30 + ((i*31)%90); ctx.fillStyle = 'rgba(6,13,18,0.95)'; ctx.fillRect(x,y,48,hgt); ctx.fillStyle = 'rgba(99,232,255,0.06)'; ctx.fillRect(x+10,y+8,14,Math.max(6,hgt-16)); }
 
-      ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(w / 2 - roadTopWidth / 2, roadY);
-      ctx.lineTo(w / 2 - roadBottomWidth / 2, h);
-      ctx.moveTo(w / 2 + roadTopWidth / 2, roadY);
-      ctx.lineTo(w / 2 + roadBottomWidth / 2, h);
-      ctx.stroke();
-
-      for (let i = 0; i < 14; i++) {
-        const t = i / 14;
-        const y = roadY + (h - roadY) * t;
-        const x1 = w / 2 - (roadTopWidth / 2 + (roadBottomWidth - roadTopWidth) * t) * 0.5;
-        const x2 = w / 2 + (roadTopWidth / 2 + (roadBottomWidth - roadTopWidth) * t) * 0.5;
-        ctx.strokeStyle = 'rgba(255,255,255,0.85)';
-        ctx.lineWidth = 4;
-        ctx.beginPath();
-        ctx.moveTo(x1 + (x2 - x1) * 0.25, y);
-        ctx.lineTo(x1 + (x2 - x1) * 0.25, y + 20);
-        ctx.moveTo(x2 - (x2 - x1) * 0.25, y);
-        ctx.lineTo(x2 - (x2 - x1) * 0.25, y + 20);
-        ctx.stroke();
-      }
+      // sun/glow
+      const sunX = w*0.82, sunY = h*0.14; const sun = ctx.createRadialGradient(sunX,sunY,6,sunX,sunY,120); sun.addColorStop(0,'rgba(255,219,110,0.95)'); sun.addColorStop(1,'rgba(255,219,110,0)'); ctx.fillStyle = sun; ctx.fillRect(sunX-160,sunY-160,320,320);
     }
 
-    function drawObstacles() {
-      for (const o of game.obstacles) {
-        const z = Math.min(1.8, o.z);
-        const scale = 1 / (0.3 + z * 1.4);
-        const x = w / 2 + o.lane * 170 * scale;
-        const y = 120 + (z - 0.2) * 260 + (1 / z) * 120;
-        const wv = 32 * scale;
-        const hv = 58 * scale;
+    function drawRoad(){
+      const roadY = h*0.18; const roadTopWidth = w*0.17; const roadBottomWidth = w*0.86;
+      ctx.fillStyle = '#14171d'; ctx.beginPath(); ctx.moveTo(w/2 - roadTopWidth/2, roadY); ctx.lineTo(w/2 + roadTopWidth/2, roadY); ctx.lineTo(w/2 + roadBottomWidth/2, h); ctx.lineTo(w/2 - roadBottomWidth/2, h); ctx.closePath(); ctx.fill();
 
-        ctx.fillStyle = o.color;
-        ctx.fillRect(x - wv / 2, y - hv / 2, wv, hv);
-        ctx.fillStyle = 'rgba(0,0,0,0.32)';
-        ctx.fillRect(x - (wv * 0.6) / 2, y - hv * 0.15, wv * 0.6, hv * 0.5);
-      }
+      // side outlines
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(w/2 - roadTopWidth/2, roadY); ctx.lineTo(w/2 - roadBottomWidth/2, h); ctx.moveTo(w/2 + roadTopWidth/2, roadY); ctx.lineTo(w/2 + roadBottomWidth/2, h); ctx.stroke();
+
+      // lane marks with motion
+      for(let i=0;i<18;i++){ const t = i/18; const y = roadY + (h-roadY)*t; const left = w/2 - (roadTopWidth/2 + (roadBottomWidth-roadTopWidth)*t)*0.5; const right = w/2 + (roadTopWidth/2 + (roadBottomWidth-roadTopWidth)*t)*0.5; ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(left + (right-left)*0.25, y + ((game.roadOffset*0.06) % 20)); ctx.lineTo(left + (right-left)*0.25, y + 18 + ((game.roadOffset*0.06) % 20)); ctx.moveTo(right - (right-left)*0.25, y + ((game.roadOffset*0.06) % 20)); ctx.lineTo(right - (right-left)*0.25, y + 18 + ((game.roadOffset*0.06) % 20)); ctx.stroke(); }
     }
 
-    function drawCoins() {
-      for (const c of game.coins) {
-        const z = Math.min(1.8, c.z);
-        const scale = 1 / (0.4 + z * 1.5);
-        const x = w / 2 + c.lane * 170 * scale;
-        const y = 100 + (z - 0.2) * 260 + (1 / z) * 110;
-        const r = c.r * scale;
+    function projectZ(z, laneOffset){ const zc = Math.min(1.9,z); const scale = 1/(0.3 + zc*1.4); const x = w/2 + laneOffset * 170 * scale; const y = 110 + (zc - 0.2) * 260 + (1/zc) * 110; return {x,y,scale}; }
 
-        ctx.beginPath();
-        ctx.fillStyle = '#ffd166';
-        ctx.arc(x, y, r, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.strokeStyle = '#fff3bf';
-        ctx.lineWidth = 2;
-        ctx.arc(x, y, r * 0.6, 0, Math.PI * 2);
-        ctx.stroke();
-      }
+    function drawObstacles(){ for(const o of game.obstacles){ const z = Math.min(1.9,o.z); const p = projectZ(z,o.lane); const wv = (o.w||32) * p.scale; const hv = (o.h||58) * p.scale; ctx.fillStyle = o.color; ctx.fillRect(p.x - wv/2, p.y - hv/2, wv, hv); ctx.fillStyle = 'rgba(0,0,0,0.28)'; ctx.fillRect(p.x - (wv*0.6)/2, p.y - hv*0.15, wv*0.6, hv*0.45); }}
+
+    function drawCoins(){ for(const c of game.coins){ const z = Math.min(1.9,c.z); const p = projectZ(z,c.lane); const r = c.r * p.scale; ctx.beginPath(); ctx.fillStyle = '#ffd166'; ctx.arc(p.x, p.y, r,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.strokeStyle = '#fff3bf'; ctx.lineWidth = 1.6; ctx.arc(p.x, p.y, r*0.6,0,Math.PI*2); ctx.stroke(); }}
+
+    function drawPlayer(){ const x = w/2 + game.playerX; const y = h - 120; const bodyW = 64; const bodyH = 96; ctx.save(); ctx.translate(x,y); // slight tilt based on lane velocity
+      const tilt = (game.playerLane - game.playerTargetLane) * -8; ctx.rotate(tilt * Math.PI/180);
+      // shadow
+      ctx.fillStyle = 'rgba(3,6,8,0.6)'; ctx.fillRect(-bodyW/2 - 6, 24, bodyW + 12, 10);
+      ctx.fillStyle = '#63e8ff'; ctx.fillRect(-bodyW/2, -bodyH/2, bodyW, bodyH);
+      ctx.fillStyle = '#eafcff'; ctx.fillRect(-22, -36, 18, 20); ctx.fillRect(6, -36, 18, 20);
+      ctx.fillStyle = '#0b1622'; ctx.fillRect(-18, -6, 14, 12); ctx.fillRect(6, -6, 14, 12); ctx.fillRect(-18, 26, 14, 12); ctx.fillRect(6, 26, 14, 12);
+      ctx.restore(); }
+
+    function drawParticles(){ for(const p of game.particles){ const alpha = Math.max(0, 1 - (p.age / p.life)); ctx.fillStyle = p.color.replace('0.9', alpha.toFixed(2)) || `rgba(255,255,255,${alpha})`; ctx.beginPath(); ctx.globalCompositeOperation = 'lighter'; ctx.fillRect(p.x - p.size/2, p.y - p.size/2, p.size, p.size); ctx.globalCompositeOperation = 'source-over'; }}
+
+    function draw(){
+      const shakeX = game.shake > 0 ? (Math.random()-0.5)*12*game.shake : 0; const shakeY = game.shake > 0 ? (Math.random()-0.5)*8*game.shake : 0;
+      ctx.clearRect(0,0,w,h); ctx.save(); ctx.translate(shakeX,shakeY);
+      drawBackground(); drawRoad(); drawCoins(); drawObstacles(); drawPlayer(); drawParticles(); ctx.restore();
+
+      // HUD overlays (optional subtle)
+      ctx.fillStyle = 'rgba(255,255,255,0.02)'; ctx.fillRect(8,h-48, w-16, 40);
     }
 
-    function drawPlayer() {
-      const x = w / 2 + game.playerX;
-      const y = h - 120;
-      const bodyW = 60;
-      const bodyH = 90;
+    // Game loop
+    let last = performance.now(); function tick(now){ const dt = Math.min((now - last)/1000, 0.04); last = now; // combine inputs
+      // copy touch into keys for update
+      if(tc.left) keys.left=true; else if(!keys.left){} // don't overwrite keyboard hold
+      if(tc.right) keys.right=true; if(tc.up) keys.up=true; if(tc.down) keys.down=true;
+      updateGame(dt); draw(); requestAnimationFrame(tick); }
 
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.fillStyle = '#63e8ff';
-      ctx.fillRect(-bodyW / 2, -bodyH / 2, bodyW, bodyH);
-      ctx.fillStyle = '#eafcff';
-      ctx.fillRect(-20, -28, 16, 18);
-      ctx.fillRect(4, -28, 16, 18);
-      ctx.fillStyle = '#0b1622';
-      ctx.fillRect(-18, -8, 12, 12);
-      ctx.fillRect(6, -8, 12, 12);
-      ctx.fillRect(-18, 22, 12, 12);
-      ctx.fillRect(6, 22, 12, 12);
-      ctx.restore();
-    }
-
-    function draw() {
-      const shakeX = game.shake > 0 ? (Math.random() - 0.5) * 10 * game.shake : 0;
-      const shakeY = game.shake > 0 ? (Math.random() - 0.5) * 10 * game.shake : 0;
-
-      ctx.clearRect(0, 0, w, h);
-      ctx.save();
-      ctx.translate(shakeX, shakeY);
-
-      drawBackground();
-      drawRoad();
-      drawCoins();
-      drawObstacles();
-      drawPlayer();
-
-      ctx.restore();
-    }
-
-    let last = performance.now();
-    function tick(now) {
-      const dt = Math.min((now - last) / 1000, 0.033);
-      last = now;
-      updateGame(dt);
-      draw();
-      requestAnimationFrame(tick);
-    }
-
-    restartBtn.addEventListener('click', () => {
-      resetGame();
-    });
-
+    // Start loop
     requestAnimationFrame(tick);
+
+    // Buttons
+    restartBtn.addEventListener('click', ()=>{ const prev = Math.floor(game.score); if(prev > loadHighscore()){ saveHighscore(prev); alert('Nowy highscore: ' + prev); } resetGame(); });
+    pauseBtn.addEventListener('click', ()=>{ game.running = !game.running; pauseBtn.textContent = game.running? 'Pause':'Resume'; if(game.running) last = performance.now(); });
+    showLeaderboard.addEventListener('click', ()=>{ const hs = loadHighscore(); const panel = $('scorePanel'); panel.style.display = panel.style.display === 'none'? 'block':'none'; $('bestList').innerHTML = `<div>Highscore: <strong>${hs}</strong></div><div>Twoje cash: <strong>${Math.floor(game.cash)}</strong></div>`; });
+
+    // Export/save when leaving
+    window.addEventListener('beforeunload', ()=>{ const prev = Math.floor(game.score); if(prev > loadHighscore()) saveHighscore(prev); });
+
+    // Show touch controls on mobile
+    function updateTouchVisibility(){ if(window.matchMedia('(max-width:760px)').matches){ touchControls.style.display='flex'; } else touchControls.style.display='none'; }
+    window.addEventListener('resize', updateTouchVisibility); updateTouchVisibility();
+
+    // Small accessibility: focus canvas to receive keyboard on mobile with bluetooth keyboard
+    canvas.tabIndex = 0;
+
+    // Minor polish: resume audio on first user gesture (autoplay policy)
+    ['click','touchstart','keydown'].forEach(evt => window.addEventListener(evt, function once(){ ensureAudio(); window.removeEventListener(evt, once); }));
+
   </script>
 </body>
 </html>
