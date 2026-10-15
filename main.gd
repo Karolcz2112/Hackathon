@@ -27,9 +27,9 @@ var dead_time: float = 0.0
 var shake: float = 0.0
 var t: float = 0.0
 var death_msg: String = ""
-var stars := PackedVector2Array()
+var stars: PackedVector2Array = PackedVector2Array()
 var sparks: Array = []
-var rng := RandomNumberGenerator.new()
+var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 func _ready() -> void:
 	rng.randomize()
@@ -110,7 +110,7 @@ func _process(delta: float) -> void:
 	shake = maxf(0.0, shake - delta)
 
 	for i in range(seg_angles.size()):
-		var sway := sin(t * 2.0 + float(i)) * 0.02
+		var sway: float = sin(t * 2.0 + float(i)) * 0.02
 		seg_angles[i] = lerpf(seg_angles[i], sway, 1.0 - exp(-delta * 3.0))
 
 	for i in range(seg_angles.size()):
@@ -162,20 +162,20 @@ func save_best() -> void:
 # ---------------------------------------------------------------- rysowanie
 
 func _draw() -> void:
-	var off := Vector2.ZERO
+	var off: Vector2 = Vector2.ZERO
 	if shake > 0.0:
 		off = Vector2(rng.randf_range(-1.0, 1.0), rng.randf_range(-1.0, 1.0)) * shake * 25.0
 	draw_set_transform(off, 0.0, Vector2.ONE)
 
 	for i in 16:
-		var c := Color("#0b1530").lerp(Color("#3a5a8c"), float(i) / 15.0)
+		var c: Color = Color("#0b1530").lerp(Color("#3a5a8c"), float(i) / 15.0)
 		draw_rect(Rect2(-20.0, i * 50.0, W + 40.0, 50.0), c)
 	for i in stars.size():
-		var a := 0.5 + 0.5 * sin(t * 2.0 + float(i))
+		var a: float = 0.5 + 0.5 * sin(t * 2.0 + float(i))
 		draw_circle(stars[i], 1.5, Color(1, 1, 1, a * 0.8))
 
 	for k in 3:
-		var rad := fmod(t * 50.0 + k * 60.0, 180.0)
+		var rad: float = fmod(t * 50.0 + k * 60.0, 180.0)
 		draw_arc(Vector2(CX, 90.0), rad, 0.0, TAU, 48, Color(1, 1, 1, (1.0 - rad / 180.0) * 0.25), 2.0)
 
 	for i in range(-1, NUM_SEGS):
@@ -197,7 +197,7 @@ func _draw() -> void:
 	for sp in sparks:
 		var p: Vector2 = sp["pos"]
 		var life: float = float(sp["life"])
-		var a := clamp(life / 0.32, 0.0, 1.0)
+		var a: float = clamp(life / 0.32, 0.0, 1.0)
 		for j in 3:
 			draw_rect(Rect2(p.x - 2 + j * 2, p.y - j * 2, 2, 2), Color(1, 0.8, 0.2, a))
 
@@ -247,14 +247,14 @@ func draw_arm(cy: float, dir: float, idx: int) -> void:
 	if idx >= 0 and idx < seg_angles.size():
 		ang = seg_angles[idx]
 	var local: Vector2 = Vector2(ARM_LEN, 0).rotated(ang * dir)
-	var tip := Vector2(base_x, cy) + Vector2(local.x * dir, local.y)
+	var tip: Vector2 = Vector2(base_x, cy) + Vector2(local.x * dir, local.y)
 	draw_line(Vector2(base_x, cy), tip, Color("#c0392b"), 8.0)
 	draw_line(Vector2(base_x, cy - 20.0), tip - Vector2(0, 20.0), Color("#c0392b"), 4.0)
 	draw_line(tip - Vector2(0, 8.0), tip + Vector2(0, 12.0), Color("#ecf0f1"), 3.0)
-	var blink := 0.6 + 0.4 * sin(t * 10.0 + float(idx))
+	var blink: float = 0.6 + 0.4 * sin(t * 10.0 + float(idx))
 	draw_circle(tip + Vector2(0, 14.0), 6.0, Color(1, 0.2, 0.2, blink))
 	for k in range(3):
-		var frac := float(k + 1) / 4.0
+		var frac: float = float(k + 1) / 4.0
 		var p: Vector2 = Vector2(base_x, cy).linear_interpolate(tip, frac)
 		draw_rect(Rect2(p.x - 3, p.y - 2, 6, 4), Color("#bdc3c7"))
 
@@ -269,6 +269,6 @@ func draw_player(x: float, y: float) -> void:
 
 
 func txt(s: String, y: float, size: int, col: Color = Color.WHITE) -> void:
-	var font := ThemeDB.fallback_font
+	var font: Font = ThemeDB.fallback_font
 	draw_string(font, Vector2(2.0, y + 2.0), s, HORIZONTAL_ALIGNMENT_CENTER, W, size, Color(0, 0, 0, 0.6))
 	draw_string(font, Vector2(0.0, y), s, HORIZONTAL_ALIGNMENT_CENTER, W, size, col)
