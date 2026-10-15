@@ -45,5 +45,5 @@ Gra zręcznościowa inspirowana Timbermanem. Wspinaj się po makietowej wieży, 
 
 ## Film
 
-Aby otworzyć prezentację, umieść plik ilm.mp4 w tym samym folderze co ten README, a następnie kliknij: [Odtwórz film](film.mp4).
+Demo: [Odtwórz film](film.mp4).
 
