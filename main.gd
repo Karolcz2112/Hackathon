@@ -1,22 +1,23 @@
 extends Node2D
-## Radiostacja Gliwice - wspinaczka (w stylu Timbermana). Zero zewnętrznych assetów.
+## Radiostacja Gliwice - wspinaczka (w stylu Timbermana). 8-bit + anteny + bardziej czytelne ruchy.
 
 const W := 480.0
 const H := 800.0
 const CX := 240.0
-const SEG_H := 84.0
+const SEG_H := 96.0
 const NUM_SEGS := 11
-const PLAYER_Y := 600.0
+const PLAYER_Y := 660.0
 const TOWER_W := 64.0
-const ARM_LEN := 120.0
-const PLAYER_DX := 78.0
+const ARM_LEN := 160.0
+const PLAYER_DX := 92.0
 const SAVE_PATH := "user://rekord.cfg"
 
 enum State { WAIT, PLAY, DEAD }
 
-var segs: Array[int] = []   # 0 = pusto, 1 = antena z lewej, 2 = antena z prawej
+var segs: Array[int] = []
+var seg_angles: Array[float] = []
 var state: State = State.WAIT
-var side: int = 0           # 0 = lewa strona wieży, 1 = prawa
+var side: int = 0
 var score: int = 0
 var best: int = 0
 var energy: float = 1.0
@@ -27,8 +28,8 @@ var shake: float = 0.0
 var t: float = 0.0
 var death_msg: String = ""
 var stars := PackedVector2Array()
+var sparks: Array = []
 var rng := RandomNumberGenerator.new()
-
 
 func _ready() -> void:
 	rng.randomize()
@@ -48,8 +49,11 @@ func rand_seg() -> int:
 
 func reset_game() -> void:
 	segs.clear()
+	seg_angles.clear()
 	for i in NUM_SEGS:
-		segs.append(0 if i < 3 else rand_seg())
+		var kind := 0 if i < 3 else rand_seg()
+		segs.append(kind)
+		seg_angles.append(0.0)
 	state = State.WAIT
 	score = 0
 	energy = 1.0
@@ -69,13 +73,16 @@ func tap(s: int) -> void:
 		state = State.PLAY
 	side = s
 	segs.remove_at(0)
+	seg_angles.remove_at(0)
 	segs.append(rand_seg())
+	seg_angles.append(rng.randf_range(-0.18, 0.18))
 	scroll = -SEG_H
 	if segs[0] == side + 1:
 		die("Zderzenie z anteną!")
 		return
 	score += 1
-	energy = minf(1.0, energy + 0.05)
+	energy = minf(1.0, energy + 0.06)
+	sparks.append({"pos": Vector2(CX + (PLAYER_DX if side == 1 else -PLAYER_DX), PLAYER_Y - 30.0), "life": 0.32})
 
 
 func die(msg: String) -> void:
@@ -94,13 +101,31 @@ func _process(delta: float) -> void:
 	var target_x := CX + (PLAYER_DX if side == 1 else -PLAYER_DX)
 	px_vis = lerpf(px_vis, target_x, 1.0 - exp(-delta * 30.0))
 	if state == State.PLAY:
-		energy -= minf(0.22 + score * 0.004, 0.55) * delta
+		energy -= minf(0.18 + score * 0.002, 0.45) * delta
 		if energy <= 0.0:
 			energy = 0.0
 			die("Zabrakło zasilania!")
 	elif state == State.DEAD:
 		dead_time += delta
 	shake = maxf(0.0, shake - delta)
+
+	for i in range(seg_angles.size()):
+		var sway := sin(t * 2.0 + float(i)) * 0.02
+		seg_angles[i] = lerpf(seg_angles[i], sway, 1.0 - exp(-delta * 3.0))
+
+	for i in range(seg_angles.size()):
+		var cy := PLAYER_Y - i * SEG_H + scroll
+		if segs[i] != 0:
+			var dist := cy - PLAYER_Y
+			if dist < SEG_H * 0.6 and dist > -SEG_H * 0.6:
+				var dir := -1.0 if segs[i] == 1 else 1.0
+				seg_angles[i] = lerpf(seg_angles[i], dir * 0.9, 1.0 - exp(-delta * 10.0))
+
+	for i in range(sparks.size() - 1, -1, -1):
+		sparks[i]["life"] -= delta
+		if sparks[i]["life"] <= 0.0:
+			sparks.remove_at(i)
+
 	queue_redraw()
 
 
@@ -142,7 +167,6 @@ func _draw() -> void:
 		off = Vector2(rng.randf_range(-1.0, 1.0), rng.randf_range(-1.0, 1.0)) * shake * 25.0
 	draw_set_transform(off, 0.0, Vector2.ONE)
 
-	# niebo
 	for i in 16:
 		var c := Color("#0b1530").lerp(Color("#3a5a8c"), float(i) / 15.0)
 		draw_rect(Rect2(-20.0, i * 50.0, W + 40.0, 50.0), c)
@@ -150,29 +174,33 @@ func _draw() -> void:
 		var a := 0.5 + 0.5 * sin(t * 2.0 + float(i))
 		draw_circle(stars[i], 1.5, Color(1, 1, 1, a * 0.8))
 
-	# fale radiowe znad wieży
 	for k in 3:
-		var rad := fmod(t * 70.0 + k * 60.0, 180.0)
-		draw_arc(Vector2(CX, 90.0), rad, 0.0, TAU, 48, Color(1, 1, 1, (1.0 - rad / 180.0) * 0.35), 3.0)
+		var rad := fmod(t * 50.0 + k * 60.0, 180.0)
+		draw_arc(Vector2(CX, 90.0), rad, 0.0, TAU, 48, Color(1, 1, 1, (1.0 - rad / 180.0) * 0.25), 2.0)
 
-	# wieża (segment -1 to "podstawa" wypełniająca lukę podczas animacji)
 	for i in range(-1, NUM_SEGS):
 		var cy := PLAYER_Y - i * SEG_H + scroll
 		if cy < -SEG_H:
 			continue
-		var kind: int = 0 if i < 0 else segs[i]
-		draw_segment(cy, kind)
+		if i < 0:
+			draw_rect(Rect2(CX - TOWER_W * 0.6, cy - SEG_H * 0.5, TOWER_W * 1.2, SEG_H), Color("#6b4a2b"))
+		else:
+			draw_segment(cy, segs[i], i)
 
-	# ziemia
 	draw_rect(Rect2(-20.0, PLAYER_Y + SEG_H * 0.5, W + 40.0, H), Color("#1e3a2a"))
 
-	# gracz
 	var py := PLAYER_Y
 	if state == State.DEAD:
 		py += minf(dead_time * dead_time * 900.0, 500.0)
 	draw_player(px_vis, py)
 
-	# HUD (bez drgań)
+	for sp in sparks:
+		var p := sp["pos"]
+		var life := sp["life"]
+		var a := clamp(life / 0.32, 0.0, 1.0)
+		for j in 3:
+			draw_rect(Rect2(p.x - 2 + j * 2, p.y - j * 2, 2, 2), Color(1, 0.8, 0.2, a))
+
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	draw_rect(Rect2(60.0, 20.0, 360.0, 22.0), Color(0, 0, 0, 0.5))
 	draw_rect(Rect2(60.0, 20.0, 360.0 * energy, 22.0), Color.RED.lerp(Color.GREEN, energy))
@@ -181,8 +209,8 @@ func _draw() -> void:
 
 	if state == State.WAIT:
 		txt("RADIOSTACJA GLIWICE", 280.0, 36, Color("#f1c40f"))
-		txt("Wspinaj się po drewnianej wieży", 330.0, 20)
-		txt("i omijaj ramiona anten!", 358.0, 20)
+		txt("Wspinaj się po żelaznej wieży (8-bit)", 330.0, 20)
+		txt("i omijaj anteny!", 358.0, 20)
 		txt("Strzałki / A D / dotyk lewej i prawej połowy ekranu", 410.0, 15)
 		txt("Spacja = zmień stronę", 436.0, 15)
 		txt("Rekord: %d" % best, 480.0, 20, Color("#f1c40f"))
@@ -196,7 +224,7 @@ func _draw() -> void:
 			txt("Dotknij, aby zagrać ponownie", 440.0, 20)
 
 
-func draw_segment(cy: float, kind: int) -> void:
+func draw_segment(cy: float, kind: int, idx: int) -> void:
 	var l := CX - TOWER_W * 0.5
 	var r := CX + TOWER_W * 0.5
 	var top_y := cy - SEG_H * 0.5
@@ -208,29 +236,36 @@ func draw_segment(cy: float, kind: int) -> void:
 	draw_line(Vector2(l, top_y), Vector2(l, bot_y), Color("#8a6238"), 6.0)
 	draw_line(Vector2(r, top_y), Vector2(r, bot_y), Color("#8a6238"), 6.0)
 	if kind == 1:
-		draw_arm(cy, -1.0)
+		draw_arm(cy, -1.0, idx)
 	elif kind == 2:
-		draw_arm(cy, 1.0)
+		draw_arm(cy, 1.0, idx)
 
 
-func draw_arm(cy: float, dir: float) -> void:
-	var x0 := CX + dir * TOWER_W * 0.5
-	var x1 := CX + dir * (TOWER_W * 0.5 + ARM_LEN)
-	var red := Color("#c0392b")
-	draw_line(Vector2(x0, cy), Vector2(x1, cy), red, 8.0)
-	draw_line(Vector2(x0, cy - 26.0), Vector2(x1, cy - 26.0), red, 4.0)
-	draw_line(Vector2(x1, cy - 26.0), Vector2(x1, cy + 10.0), red, 4.0)
-	draw_circle(Vector2(x1, cy + 17.0), 7.0, Color("#ecf0f1"))
-	draw_line(Vector2(x1, cy + 24.0), Vector2(x0, cy + SEG_H * 0.45), Color("#ecf0f1"), 2.0)
+func draw_arm(cy: float, dir: float, idx: int) -> void:
+	var base_x := CX + dir * TOWER_W * 0.5
+	var ang := 0.0
+	if idx >= 0 and idx < seg_angles.size():
+		ang = seg_angles[idx]
+	var local := Vector2(ARM_LEN, 0).rotated(ang * dir)
+	var tip := Vector2(base_x, cy) + Vector2(local.x * dir, local.y)
+	draw_line(Vector2(base_x, cy), tip, Color("#c0392b"), 8.0)
+	draw_line(Vector2(base_x, cy - 20.0), tip - Vector2(0, 20.0), Color("#c0392b"), 4.0)
+	draw_line(tip - Vector2(0, 8.0), tip + Vector2(0, 12.0), Color("#ecf0f1"), 3.0)
+	var blink := 0.6 + 0.4 * sin(t * 10.0 + float(idx))
+	draw_circle(tip + Vector2(0, 14.0), 6.0, Color(1, 0.2, 0.2, blink))
+	for k in range(3):
+		var frac := float(k + 1) / 4.0
+		var p := Vector2(base_x, cy).linear_interpolate(tip, frac)
+		draw_rect(Rect2(p.x - 3, p.y - 2, 6, 4), Color("#bdc3c7"))
 
 
 func draw_player(x: float, y: float) -> void:
-	draw_rect(Rect2(x - 11.0, y - 4.0, 9.0, 26.0), Color("#2c3e50"))
-	draw_rect(Rect2(x + 2.0, y - 4.0, 9.0, 26.0), Color("#2c3e50"))
-	draw_rect(Rect2(x - 14.0, y - 26.0, 28.0, 28.0), Color("#e67e22"))
-	draw_circle(Vector2(x, y - 36.0), 11.0, Color("#f1c27d"))
-	draw_rect(Rect2(x - 13.0, y - 50.0, 26.0, 12.0), Color("#f1c40f"))
-	draw_line(Vector2(x + 14.0, y - 14.0), Vector2(x + 22.0, y - 40.0), Color("#bdc3c7"), 3.0)
+	draw_rect(Rect2(x - 12.0, y - 6.0, 8.0, 26.0), Color("#2c3e50"))
+	draw_rect(Rect2(x + 4.0, y - 6.0, 8.0, 26.0), Color("#2c3e50"))
+	draw_rect(Rect2(x - 16.0, y - 30.0, 32.0, 30.0), Color("#e67e22"))
+	draw_circle(Vector2(x, y - 38.0), 10.0, Color("#f1c27d"))
+	draw_rect(Rect2(x - 14.0, y - 54.0, 28.0, 12.0), Color("#f1c40f"))
+	draw_line(Vector2(x + 16.0, y - 18.0), Vector2(x + 28.0, y - 44.0), Color("#bdc3c7"), 3.0)
 
 
 func txt(s: String, y: float, size: int, col: Color = Color.WHITE) -> void:
